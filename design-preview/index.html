@@ -1,0 +1,848 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>windlively · 清欢小院（设计预览 · 单页 Tab）</title>
+<style>
+:root{
+  /* 配色以 Codex「清欢手札」稿为准 */
+  --paper:#f5f0e3; --card:rgba(255,253,247,.76); --card-hi:#fffdf7;
+  --ink:#243a32; --muted:#79877a; --moss:#667c61; --sage:#dce6d5; --sage-deep:#aabb9e;
+  --clay:#cb8062; --butter:#eac976;
+  --line:rgba(54,76,61,.13);
+  --sh-card:0 8px 28px rgba(61,68,47,.05);
+  --sh3:0 10px 30px rgba(61,68,47,.07);
+  --sh5:0 18px 46px rgba(61,68,47,.10);
+  --shadow:0 16px 44px rgba(61,68,47,.08);
+  --cal0:rgba(54,76,61,.10); --cal1:#dce6d5; --cal2:#aabb9e; --cal3:#667c61; --cal4:#243a32;
+  --serif:"Songti SC","Noto Serif SC","Source Han Serif SC",serif;
+  --sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",-apple-system,sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+}
+*{box-sizing:border-box;border-radius:0}
+html{height:100%}
+body{margin:0;min-height:100%;background-color:var(--paper);background-image:radial-gradient(rgba(93,112,79,.11) .65px,transparent .65px);background-size:8px 8px;color:var(--ink);font:16px/1.75 var(--sans);display:flex;flex-direction:column;transition:background-color .45s,color .45s}
+::selection{background:var(--sage);color:var(--ink)}
+:focus-visible{outline:2px solid var(--moss);outline-offset:2px}
+a{color:var(--ink);text-underline-offset:3px}
+img,svg{display:block}
+h1,h2,h3{text-wrap:balance;margin:0}
+
+/* 顶行（仅品牌）与模块导航：导航在日历条下方，贴着它所切换的面板 */
+.topline{display:flex;align-items:center;padding-top:2px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;flex:none}
+.brand b{font-family:var(--mono);font-size:17px;letter-spacing:.06em}
+.tabs{display:flex;gap:6px;justify-content:flex-end}
+.tab{width:34px;height:34px;display:grid;place-items:center;border:0;background:var(--card-hi);box-shadow:0 5px 14px rgba(61,68,47,.12);cursor:pointer;transition:transform .16s,box-shadow .16s,background .2s}
+.tab svg{display:block}
+.tab:hover{transform:translateY(-2px);box-shadow:0 9px 20px rgba(61,68,47,.16)}
+.tab:active{transform:translateY(1px);box-shadow:0 2px 6px rgba(61,68,47,.10)}
+.tab[aria-selected="true"]{background:#e7eadb;transform:translateY(1px);box-shadow:0 2px 6px rgba(61,68,47,.10)}
+
+/* 舞台 */
+.stage{flex:1;min-height:0;max-width:1150px;width:100%;margin:0 auto;padding:26px 24px 14px;display:flex;gap:26px}
+.rail{flex:none;width:238px;display:flex;flex-direction:column;gap:14px;align-self:flex-start;position:sticky;top:26px}
+.scene{position:relative;flex:none;height:186px;background:#e7edda;box-shadow:var(--shadow);overflow:hidden;transition:background-color .45s}
+.scene canvas{display:block;image-rendering:pixelated}
+.scene-line{position:absolute;left:10px;right:10px;bottom:14px;height:1px;background:linear-gradient(90deg,transparent,rgba(51,73,56,.20) 12%,rgba(51,73,56,.20) 88%,transparent)}
+.deco{position:absolute;pointer-events:none;z-index:0}
+/* 画框里的小猫 */
+.deco-cat{left:50%;bottom:14px;transform:translateX(-50%);animation:breathe 4.6s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-1px)}}
+
+/* 左栏小部件 */
+.widget{flex:none;background:var(--card-hi);box-shadow:var(--sh-card);padding:16px 18px}
+.w-top{display:flex;align-items:center;gap:12px}
+.w-top b{font-size:15px;font-family:var(--mono)}
+.w-top p{margin:3px 0 0;font-size:12.5px;color:var(--muted)}
+.w-note{margin:12px 0 0;padding-top:10px;border-top:1px dashed var(--line);font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+.w-title{margin:0 0 10px;font-family:var(--mono);font-size:12px;color:var(--muted);display:flex;align-items:center;gap:8px}
+.w-tag{font-size:10.5px;background:#edf0e5;padding:2px 7px;color:#63735f}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips span{font-family:var(--mono);font-size:11.5px;background:#edf0e5;padding:2px 7px;color:#63735f}
+.ico{width:40px;height:40px;background:#e7eadb;display:grid;place-items:center;color:#65755f;flex:none}
+
+/* 主列：问候 + 面板 */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px}
+.greet{flex:none;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:26px;align-items:end}
+.gtop{display:flex;align-items:center;gap:14px}
+.avatar{display:none;width:84px;height:84px;overflow:hidden;position:relative;background:#e7edda;box-shadow:var(--sh-card);flex:none;transition:background-color .45s}
+.avatar canvas{position:absolute;left:-3px;top:-2px;image-rendering:pixelated;display:block}
+.idline{display:flex;align-items:center;gap:8px;margin:0 0 10px;font-family:var(--mono);font-size:12.5px;letter-spacing:.04em;color:var(--muted)}
+.idline i{width:7px;height:7px;background:var(--clay);flex:none}
+.greet h1{font-family:var(--serif);font-size:34px;font-weight:600;letter-spacing:.04em;line-height:1.25}
+.lede{margin:12px 0 0;font-size:14.5px;color:var(--ink)}
+/* 右上角小景：几枝垂柳挂在小溪上 */
+.greet-scene{position:relative;align-self:end;width:288px;height:186px;line-height:0}
+.greet-scene canvas{display:block;image-rendering:pixelated}
+.greet-scene::after{content:'';position:absolute;left:-30px;right:-8px;bottom:24px;height:1px;background:linear-gradient(90deg,transparent,rgba(51,73,56,.20) 14%,rgba(51,73,56,.20) 86%,transparent)}
+.scene-mono{margin:0;text-align:right;font-family:var(--mono);font-size:12px;color:var(--muted);min-height:18px}
+
+/* 面板：一个页签一间屋；内容高于剩余空间时整页自然滚动 */
+.panel-wrap{flex:1;display:flex;flex-direction:column}
+.panel{background:var(--card);box-shadow:var(--shadow);display:none;flex:1;transition:background-color .45s}
+.panel.is-active{display:flex;flex-direction:column;animation:panelIn .2s ease-out}
+@keyframes panelIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+.panel-scroll{padding:20px 22px}
+.panel-head{display:flex;align-items:baseline;gap:14px;margin:0 0 16px}
+.panel-head .head-l{display:flex;align-items:baseline;gap:12px}
+.kicker{font-family:var(--mono);font-size:10.5px;letter-spacing:.15em;color:#a17c60}
+.panel-head h2{font-size:18px;font-weight:600}
+.panel-head .meta{margin-left:auto;font-size:12.5px;color:var(--muted)}
+.panel-head .meta a{color:var(--muted)}
+
+/* 工具箱 */
+.tools-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.card{background:var(--card-hi);box-shadow:var(--sh-card);transition:transform .2s,box-shadow .2s,background .2s}
+a.card{display:block;text-decoration:none;padding:15px}
+a.card:hover{transform:translateY(-3px);box-shadow:var(--sh5)}
+.card-top{display:flex;align-items:center;gap:12px}
+.card h3{font-size:16px;font-weight:600}
+.card .no{margin-left:auto;font-family:var(--mono);font-size:11px;color:#243a32;background:var(--butter);padding:1px 6px}
+.card p{margin:11px 0 0;font-size:13px;color:var(--muted);line-height:1.7}
+
+/* 手记：时间轴轨道 + 引语卡 */
+.notes-list{border-top:1px dashed var(--line);position:relative;--rail:10px}
+.quote-card{position:relative;overflow:hidden;background:#f2e5d3;box-shadow:var(--sh-card);padding:12px 15px;margin:0 0 10px}
+.quote-card::after{content:'✿';position:absolute;right:14px;bottom:-16px;color:rgba(177,126,91,.16);font-size:70px;line-height:1;transform:rotate(-15deg);pointer-events:none}
+.q-label{margin:0 0 4px;font-family:var(--mono);font-size:10px;line-height:1.4;letter-spacing:.13em;color:#9A8067}
+.q-text{margin:0 0 4px;font-family:var(--serif);font-size:14px;line-height:1.62;color:#735d4e}
+.q-sign{font-family:var(--mono);font-size:10.5px;line-height:1.4;color:#A07D64}
+#p-notes .panel-scroll{padding:16px 22px}
+#p-notes .panel-head{margin-bottom:8px}
+.notes-list::before{content:'';position:absolute;left:var(--rail);top:26px;bottom:26px;width:1px;background:var(--line)}
+.notes-list .note{padding:11px 4px 11px 44px}
+.note{display:flex;align-items:center;gap:18px;border-bottom:1px dashed var(--line);text-decoration:none;position:relative}
+.note::before{content:'';position:absolute;left:calc(var(--rail) - 6px);top:50%;margin-top:-6px;width:9px;height:9px;background:#8ca185;border:2px solid var(--paper);box-sizing:content-box}
+.note time{font-family:var(--mono);font-size:12.5px;color:var(--muted);min-width:86px}
+.note b{font-weight:500}
+.note .stamp{margin-left:auto;width:26px;height:26px;border:1px solid var(--clay);color:var(--clay);font-family:var(--mono);font-size:11px;display:grid;place-items:center;transform:rotate(-3deg);flex:none}
+.note:hover b{text-decoration:underline;text-underline-offset:4px}
+@media (min-width:1100px){
+  .notes-list{--rail:92px}
+  .notes-list .note{padding-left:128px}
+}
+
+/* 作品 */
+.works-head{display:flex;align-items:baseline;gap:14px;margin:0 0 16px}
+.works-head h2{font-size:18px;font-weight:600}
+.tabs2{margin-left:auto;display:flex;gap:8px}
+.tab2{font-family:var(--mono);font-size:12.5px;padding:5px 14px;border:1px solid var(--line);background:rgba(255,255,255,.38);color:var(--muted);cursor:pointer;transition:background .2s,color .2s}
+.tab2[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.works-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.repo{padding:16px}
+.repo h3{font-size:15px;font-family:var(--mono)}
+.repo p{margin:10px 0 12px;font-size:13px;color:var(--muted)}
+.repo .row{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);font-family:var(--mono)}
+.dot{width:9px;height:9px}
+.repo .stars{margin-left:auto}
+
+/* 首页 · 活跃日历条（原「足迹」页签并入首屏） */
+.hero-cal{flex:none;background:var(--card-hi);box-shadow:var(--sh-card);padding:10px 16px 9px;transition:background-color .45s}
+.cal-row{display:flex;flex-direction:column;gap:8px}
+.cal-cap{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px}
+.hc-kicker{font-family:var(--mono);font-size:10px;letter-spacing:.13em;color:#a17c60}
+.cal-cap .sum{font-size:14px;color:var(--ink)}
+.cal-cap .sum b{font-family:var(--mono);font-weight:600}
+.cal-cap .cal-note{font-size:11.5px;color:var(--muted)}
+.cal-scroll{overflow-x:auto;min-width:0}
+.cal{display:flex;gap:8px;width:max-content}
+.cal-weeks{display:grid;grid-template-rows:repeat(7,10px);gap:2px;padding-top:18px;font-family:var(--mono);font-size:9.5px;color:var(--muted)}
+.cal-weeks span{height:10px;line-height:10px}
+.cal-body{display:grid;grid-template-rows:16px 1fr;gap:2px}
+.cal-months{display:grid;gap:2px;font-family:var(--mono);font-size:9.5px;color:var(--muted)}
+.cal-months span{white-space:nowrap;overflow:visible}
+.cal-grid{display:grid;grid-template-rows:repeat(7,10px);grid-auto-flow:column;gap:2px}
+.c{display:block;width:10px;height:10px;background:var(--cal0)}
+.c.f{background:transparent}
+.c[data-l="1"]{background:var(--cal1)}
+.c[data-l="2"]{background:var(--cal2)}
+.c[data-l="3"]{background:var(--cal3)}
+.c[data-l="4"]{background:var(--cal4)}
+.cal-legend{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted);font-family:var(--mono);margin-left:auto}
+.cal-legend .c{margin:0}
+#cal-tip{position:fixed;z-index:60;background:var(--card-hi);border:1px solid var(--line);box-shadow:0 12px 30px rgba(61,68,47,.16);font-family:var(--mono);font-size:11.5px;color:var(--ink);padding:4px 9px;pointer-events:none;display:none}
+
+/* 关于 */
+.about-grid{display:grid;grid-template-columns:280px minmax(0,1fr);gap:20px;align-items:start}
+.letter{background:var(--card-hi);box-shadow:var(--sh3);max-width:640px;padding:22px 24px;position:relative;transition:background-color .45s}
+.letter p{margin:0 0 14px;font-size:14.5px}
+.letter .poem-source{margin:0 0 7px;font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:#9d7058}
+.letter .poem{margin:0 0 13px;padding:0 0 0 14px;border-left:2px solid #bd9473;color:#526757;font-family:var(--serif);font-size:14.5px;line-height:2;letter-spacing:.04em}
+.letter .letter-line{margin:0 0 14px;font-size:13.5px;color:var(--muted)}
+.letter .links{display:flex;gap:20px;flex-wrap:wrap;font-size:14px}
+.letter .links a{color:var(--muted)}
+.tl{list-style:none;margin:0;padding:0 0 0 16px;position:relative}
+.tl::before{content:'';position:absolute;left:4px;top:6px;bottom:8px;width:1px;background:var(--line)}
+.tl li{position:relative;padding:0 0 7px}
+.tl li:last-child{padding-bottom:0}
+.tl li::before{content:'';position:absolute;left:-18px;top:5px;width:7px;height:7px;background:#8ca185;border:2px solid var(--card-hi)}
+.tl li.now::before{background:var(--clay)}
+.tl time{font-family:var(--mono);font-size:11px;color:var(--muted);display:block;line-height:1.45}
+.tl b{font-weight:600;font-size:13px;line-height:1.5}
+.tl p{margin:0;font-size:12px;color:var(--muted);line-height:1.55}
+#p-about .panel-head{margin-bottom:6px}
+#p-about .panel-scroll{padding:16px 22px}
+
+footer{flex:none;border-top:1px solid var(--line);padding:12px 24px 14px;font-size:12.5px;color:var(--muted)}
+footer .in{max-width:1150px;margin:0 auto;display:flex;align-items:center;gap:16px}
+footer .right{margin-left:auto;font-family:var(--mono);font-size:12px}
+
+/* 预览控制条（不属于设计本身） */
+.pv-bar{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:50;display:flex;align-items:center;gap:12px;background:var(--ink);color:var(--paper);padding:8px 14px;box-shadow:0 14px 34px rgba(0,0,0,.22);font-size:12.5px}
+.pv-bar .lab{font-family:var(--mono);font-size:11.5px;opacity:.85}
+.pv-bar a{font-family:var(--mono);font-size:11.5px;padding:4px 10px;border:1px solid currentColor;color:var(--paper);text-decoration:none;white-space:nowrap}
+.pv-bar a:hover{background:var(--sage);border-color:var(--sage);color:var(--ink)}
+.pv-bar .hint{opacity:.75}
+
+/* 昼夜主题（取值同样以 Codex 稿为准） */
+body.night{
+  color-scheme:dark;
+  --paper:#202c2a; --card:rgba(44,58,49,.82); --card-hi:#34483b;
+  --ink:#e8e5d6; --muted:#a6b2a2; --moss:#8ca185; --sage:#35443a; --sage-deep:#596b55;
+  --clay:#c4876c; --butter:#eac976;
+  --line:rgba(229,231,206,.15);
+  --sh-card:0 8px 28px rgba(0,0,0,.18);
+  --sh3:0 10px 30px rgba(0,0,0,.16);
+  --sh5:0 18px 46px rgba(0,0,0,.24);
+  --shadow:0 16px 44px rgba(0,0,0,.15);
+  --cal0:rgba(229,231,206,.06); --cal1:#455847; --cal2:#617763; --cal3:#88a281; --cal4:#c9d9bb;
+  background-image:radial-gradient(rgba(221,223,190,.11) .65px,transparent .65px);
+}
+body.night .scene,body.night .avatar{background:#3d5147}
+body.night .scene-line,body.night .greet-scene::after{background:linear-gradient(90deg,transparent,rgba(229,231,206,.20) 12%,rgba(229,231,206,.20) 88%,transparent)}
+body.night .tab{background:#34483b;box-shadow:0 5px 14px rgba(0,0,0,.22)}
+body.night .tab:hover{box-shadow:0 9px 20px rgba(0,0,0,.28)}
+body.night .tab[aria-selected="true"]{background:#455643}
+body.night .tab2[aria-pressed="false"]{background:rgba(43,58,49,.82)}
+body.night .ico{background:#455643;color:#d0d9bf}
+body.night .chips span,body.night .w-tag{background:#3d4c40;color:#c0cdb8}
+body.night .quote-card{background:#4a4034}
+body.night .quote-card::after{color:rgba(214,160,120,.13)}
+body.night .q-label,body.night .kicker,body.night .hc-kicker{color:#c9a283}
+body.night .q-text,body.night .q-sign{color:#e2c5a6}
+body.night .letter .poem{color:#b6c0ad}
+body.night .letter .poem-source{color:#c9a283}
+body.night .pv-bar{background:#e8e5d6;color:#22302a}
+
+@media (max-width:899px){
+  /* 窄屏改为整页滚动：面板不再固定在单屏里 */
+  body{height:auto;min-height:100vh;overflow:auto}
+  .topline{flex-wrap:wrap;gap:10px}
+  .tabs{justify-content:flex-start;width:100%;overflow-x:auto;padding-bottom:2px}
+  .tab{flex:none}
+  .stage{flex-direction:column;gap:14px;padding:14px 16px 10px}
+  .rail{display:none}
+  .avatar{display:block}
+  .greet{grid-template-columns:1fr;gap:14px}
+  .greet h1{font-size:27px}
+  .lede{display:none}
+  .greet-scene{justify-self:center}
+  .scene-mono{text-align:center}
+  .panel-scroll{padding:16px}
+  .tools-grid,.works-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .about-grid{grid-template-columns:1fr}
+}
+@media (max-width:599px){
+  .brand b{font-size:15px;letter-spacing:0}
+  .panel-scroll{padding:14px}
+  .tools-grid,.works-grid{grid-template-columns:1fr}
+  .note .stamp{display:none}
+  footer{padding:10px 16px 12px}
+  footer .in{flex-wrap:wrap;gap:8px}
+  footer .right{margin-left:0}
+  .pv-bar{left:8px;right:8px;transform:none;width:auto;justify-content:center;gap:10px}
+  .pv-bar .hint{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{transition:none!important;animation:none!important}
+}
+</style>
+</head>
+<body>
+<div class="stage">
+  <aside class="rail">
+    <div class="scene" aria-hidden="true">
+      <canvas id="sp-cat" class="deco deco-cat"></canvas>
+      <span class="scene-line"></span>
+    </div>
+    <div class="widget">
+      <div class="w-top"><div><b>windlively</b><p>程序员 · 前端 / 全栈</p></div></div>
+      <p class="w-note">咖啡续命 · 像素画 · 猫</p>
+    </div>
+    <div class="widget">
+      <p class="w-title">此刻 <span class="w-tag">随手记</span></p>
+      <ol class="tl now-list">
+        <li class="now"><b>此刻</b><p>一盏新茶，窗外有风</p></li>
+        <li><b>最近</b><p>在读《人间词话》</p></li>
+        <li><b>一直</b><p>把平常日子过得有滋味</p></li>
+      </ol>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topline">
+      <a class="brand" href="#tools" aria-label="windlively 首页">
+        <svg width="18" height="18" viewBox="0 0 16 16" shape-rendering="crispEdges" aria-hidden="true">
+          <rect x="3" y="6" width="9" height="7" fill="#fffdf7"/><rect x="3" y="6" width="9" height="1" fill="#667c61"/><rect x="3" y="12" width="9" height="1" fill="#667c61"/><rect x="2" y="9" width="1" height="3" fill="#667c61"/><rect x="12" y="8" width="2" height="3" fill="#667c61"/><rect x="13" y="7" width="1" height="1" fill="#667c61"/><rect x="2" y="14" width="12" height="1" fill="#667c61"/><rect x="5" y="3" width="1" height="2" fill="#dce6d5"/><rect x="8" y="2" width="1" height="2" fill="#dce6d5"/>
+        </svg>
+        <b>windlively</b>
+      </a>
+    </div>
+    <div class="greet">
+      <div>
+        <div class="gtop">
+          <span class="avatar" aria-hidden="true"><canvas id="sp-cat-m"></canvas></span>
+          <div>
+            <p class="idline"><i aria-hidden="true"></i>windlively · 前端 / 全栈 · 写一点小工具</p>
+            <h1>人间有味是清欢</h1>
+          </div>
+        </div>
+        <p class="lede">写一点代码，记一些想法，把好用的小东西收进这方小院。</p>
+      </div>
+      <div class="greet-scene">
+        <canvas id="sp-scene" aria-hidden="true"></canvas>
+      </div>
+    </div>
+    <p class="scene-mono" aria-hidden="true">柳垂溪上 · 水过门前</p>
+
+    <div class="hero-cal">
+      <div id="cal-host" class="cal-box"></div>
+    </div>
+
+    <nav class="tabs" role="tablist" aria-label="小院模块">
+      <button class="tab" role="tab" data-tab="tools" aria-selected="true" title="工具箱" aria-label="工具箱"><svg width="20" height="20" viewBox="0 0 20 20" shape-rendering="crispEdges" aria-hidden="true"><rect x="7" y="3" width="6" height="1" fill="#243a32"/><rect x="7" y="4" width="1" height="2" fill="#243a32"/><rect x="12" y="4" width="1" height="2" fill="#243a32"/><rect x="3" y="6" width="14" height="1" fill="#243a32"/><rect x="3" y="7" width="14" height="7" fill="#667c61"/><rect x="3" y="14" width="14" height="1" fill="#243a32"/><rect x="9" y="9" width="2" height="3" fill="#eac976"/></svg></button>
+      <button class="tab" role="tab" data-tab="notes" aria-selected="false" title="手记" aria-label="手记"><svg width="20" height="20" viewBox="0 0 20 20" shape-rendering="crispEdges" aria-hidden="true"><rect x="4" y="3" width="12" height="14" fill="#fffdf7"/><rect x="4" y="3" width="12" height="1" fill="#667c61"/><rect x="4" y="16" width="12" height="1" fill="#667c61"/><rect x="4" y="3" width="1" height="14" fill="#667c61"/><rect x="15" y="3" width="1" height="14" fill="#667c61"/><rect x="7" y="7" width="6" height="1" fill="#667c61"/><rect x="7" y="10" width="6" height="1" fill="#dce6d5"/><rect x="7" y="13" width="4" height="1" fill="#667c61"/></svg></button>
+      <button class="tab" role="tab" data-tab="works" aria-selected="false" title="作品" aria-label="作品"><svg width="20" height="20" viewBox="0 0 20 20" shape-rendering="crispEdges" aria-hidden="true"><rect x="3" y="3" width="5" height="1" fill="#243a32"/><rect x="3" y="4" width="5" height="2" fill="#cb8062"/><rect x="2" y="6" width="16" height="9" fill="#cb8062"/><rect x="2" y="6" width="16" height="1" fill="#243a32"/><rect x="2" y="14" width="16" height="1" fill="#243a32"/><rect x="2" y="6" width="1" height="9" fill="#243a32"/><rect x="17" y="6" width="1" height="9" fill="#243a32"/></svg></button>
+      <button class="tab" role="tab" data-tab="about" aria-selected="false" title="关于" aria-label="关于"><svg width="20" height="20" viewBox="0 0 20 20" shape-rendering="crispEdges" aria-hidden="true"><rect x="3" y="5" width="14" height="10" fill="#fffdf7"/><rect x="3" y="5" width="14" height="1" fill="#667c61"/><rect x="3" y="14" width="14" height="1" fill="#667c61"/><rect x="3" y="5" width="1" height="10" fill="#667c61"/><rect x="16" y="5" width="1" height="10" fill="#667c61"/><rect x="4" y="7" width="2" height="1" fill="#667c61"/><rect x="6" y="8" width="2" height="1" fill="#667c61"/><rect x="8" y="9" width="4" height="1" fill="#667c61"/><rect x="12" y="8" width="2" height="1" fill="#667c61"/><rect x="14" y="7" width="2" height="1" fill="#667c61"/></svg></button>
+    </nav>
+
+    <div class="panel-wrap">
+      <section class="panel is-active" id="p-tools" role="tabpanel" aria-label="工具箱">
+        <div class="panel-scroll">
+          <div class="panel-head"><div class="head-l"><span class="kicker">WORKBENCH · 01</span><h2>工具箱</h2></div><span class="meta">六件小工具</span></div>
+          <div class="tools-grid">
+            <a class="card" href="#tools" data-tool="ocr">
+              <div class="card-top">
+                <span class="ico"><svg width="24" height="24" viewBox="0 0 24 24" shape-rendering="crispEdges" aria-hidden="true"><rect x="4" y="9" width="16" height="10" fill="#667c61"/><rect x="8" y="6" width="8" height="3" fill="#667c61"/><rect x="9" y="11" width="6" height="6" fill="#f5f0e3"/><rect x="11" y="13" width="2" height="2" fill="#243a32"/><rect x="14" y="10" width="2" height="1" fill="#aabb9e"/><rect x="5" y="18" width="3" height="1" fill="#dce6d5"/></svg></span>
+                <h3>图片识别</h3><span class="no">01</span>
+              </div>
+              <p>印刷体与手写体 OCR，识别由服务器后端完成。</p>
+            </a>
+            <a class="card" href="#tools" data-tool="image">
+              <div class="card-top">
+                <span class="ico"><svg width="24" height="24" viewBox="0 0 24 24" shape-rendering="crispEdges" aria-hidden="true"><rect x="7" y="4" width="13" height="11" fill="#aabb9e"/><rect x="4" y="8" width="15" height="12" fill="#667c61"/><rect x="5" y="9" width="13" height="10" fill="#fffdf7"/><rect x="6" y="15" width="5" height="3" fill="#dce6d5"/><rect x="10" y="13" width="3" height="5" fill="#dce6d5"/><rect x="14" y="11" width="2" height="2" fill="#cb8062"/></svg></span>
+                <h3>图片工具</h3><span class="no">02</span>
+              </div>
+              <p>图片编码与格式转换，Base64 与尺寸信息。</p>
+            </a>
+            <a class="card" href="#tools" data-tool="json">
+              <div class="card-top">
+                <span class="ico"><svg width="24" height="24" viewBox="0 0 24 24" shape-rendering="crispEdges" aria-hidden="true"><rect x="6" y="3" width="12" height="18" fill="#667c61"/><rect x="7" y="4" width="10" height="16" fill="#fffdf7"/><rect x="9" y="9" width="1" height="1" fill="#243a32"/><rect x="8" y="10" width="1" height="4" fill="#243a32"/><rect x="9" y="14" width="1" height="1" fill="#243a32"/><rect x="14" y="9" width="1" height="1" fill="#243a32"/><rect x="15" y="10" width="1" height="4" fill="#243a32"/><rect x="14" y="14" width="1" height="1" fill="#243a32"/></svg></span>
+                <h3>JSON 预览</h3><span class="no">03</span>
+              </div>
+              <p>格式化与树形查看，长路径局部滚动。</p>
+            </a>
+            <a class="card" href="#tools" data-tool="unit">
+              <div class="card-top">
+                <span class="ico"><svg width="24" height="24" viewBox="0 0 24 24" shape-rendering="crispEdges" aria-hidden="true"><rect x="3" y="9" width="18" height="7" fill="#B68158"/><rect x="6" y="10" width="1" height="3" fill="#fffdf7"/><rect x="9" y="10" width="1" height="4" fill="#fffdf7"/><rect x="12" y="10" width="1" height="3" fill="#fffdf7"/><rect x="15" y="10" width="1" height="4" fill="#fffdf7"/><rect x="18" y="10" width="1" height="3" fill="#fffdf7"/></svg></span>
+                <h3>单位转换</h3><span class="no">04</span>
+              </div>
+              <p>常用单位换算，小数与负数都能输入。</p>
+            </a>
+            <a class="card" href="#tools" data-tool="monaco">
+              <div class="card-top">
+                <span class="ico"><svg width="24" height="24" viewBox="0 0 24 24" shape-rendering="crispEdges" aria-hidden="true"><rect x="5" y="5" width="14" height="10" fill="#243a32"/><rect x="6" y="6" width="12" height="8" fill="#fffdf7"/><rect x="8" y="8" width="5" height="1" fill="#667c61"/><rect x="8" y="10" width="7" height="1" fill="#cb8062"/><rect x="8" y="12" width="3" height="1" fill="#aabb9e"/><rect x="3" y="15" width="18" height="3" fill="#667c61"/></svg></span>
+                <h3>Monaco 编辑器</h3><span class="no">05</span>
+              </div>
+              <p>浏览器里的代码编辑器，支持导出到本地。</p>
+            </a>
+            <a class="card" href="#tools" data-tool="lab">
+              <div class="card-top">
+                <span class="ico"><svg width="24" height="24" viewBox="0 0 24 24" shape-rendering="crispEdges" aria-hidden="true"><rect x="11" y="3" width="2" height="4" fill="#dce6d5"/><rect x="8" y="4" width="2" height="2" fill="#dce6d5"/><rect x="14" y="4" width="2" height="2" fill="#dce6d5"/><rect x="10" y="7" width="4" height="3" fill="#aabb9e"/><rect x="8" y="10" width="8" height="3" fill="#aabb9e"/><rect x="7" y="13" width="10" height="3" fill="#aabb9e"/><rect x="6" y="16" width="12" height="4" fill="#aabb9e"/><rect x="8" y="17" width="8" height="2" fill="#667c61"/></svg></span>
+                <h3>Angular 实验室</h3><span class="no">06</span>
+              </div>
+              <p>Angular 特性演示：信号、effect 与路由。</p>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="p-notes" role="tabpanel" aria-label="手记">
+        <div class="panel-scroll">
+          <div class="panel-head"><div class="head-l"><span class="kicker">FIELD NOTES · 02</span><h2>手记</h2></div><span class="meta"><a href="#notes">去博客看看 →</a></span></div>
+          <article class="quote-card">
+            <p class="q-label">MARGIN NOTE · 手边记</p>
+            <p class="q-text">“不必每一天都闪闪发光，<br>有一盏茶的温度，也很好。”</p>
+            <span class="q-sign">— 写给寻常日子的便笺</span>
+          </article>
+          <div class="notes-list">
+            <a class="note" href="#notes"><time>2026-09-28</time><b>在 Angular 里给页面过渡留一条后路</b><span class="stamp">01</span></a>
+            <a class="note" href="#notes"><time>2026-09-12</time><b>把一张图变成一段代码：像素小院的矢量化</b><span class="stamp">02</span></a>
+            <a class="note" href="#notes"><time>2026-08-30</time><b>六个小工具，一间工具箱</b><span class="stamp">03</span></a>
+            <a class="note" href="#notes"><time>2026-08-16</time><b>手写体 OCR 的三个坑</b><span class="stamp">04</span></a>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="p-works" role="tabpanel" aria-label="作品">
+        <div class="panel-scroll">
+          <div class="works-head">
+            <span class="kicker">PROJECTS · 03</span>
+            <h2>作品</h2>
+            <div class="tabs2" role="group" aria-label="仓库来源">
+              <button class="tab2" aria-pressed="true">GitHub</button>
+              <button class="tab2" aria-pressed="false">Gitee</button>
+            </div>
+          </div>
+          <div class="works-grid">
+            <a class="card repo" href="#works">
+              <h3>windlively</h3>
+              <p>个人主页与小工具集合：像素小院、六个工具、手记与作品。</p>
+              <div class="row"><span class="dot" style="background:#aabb9e"></span>TypeScript<span class="stars">★ 12</span></div>
+            </a>
+            <a class="card repo" href="#works">
+              <h3>sundry-booklet</h3>
+              <p>随手记的小册子，把零散的想法收成一本。</p>
+              <div class="row"><span class="dot" style="background:#dce6d5"></span>TypeScript<span class="stars">★ 7</span></div>
+            </a>
+            <a class="card repo" href="#works">
+              <h3>resume</h3>
+              <p>一份用网页排版的简历，可导出 PDF。</p>
+              <div class="row"><span class="dot" style="background:#cb8062"></span>CSS<span class="stars">★ 3</span></div>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="p-about" role="tabpanel" aria-label="关于">
+        <div class="panel-scroll">
+          <div class="panel-head"><div class="head-l"><span class="kicker">ABOUT THE YARD · 04</span><h2>关于这方小院</h2></div><span class="meta">博客 · GitHub · Gitee · 邮件</span></div>
+          <div class="about-grid">
+            <div class="widget">
+              <p class="w-title">小院年表 <span class="w-tag">示意</span></p>
+              <ol class="tl">
+                <li class="now"><time>2026.10</time><b>像素小院改版</b><p>元素融入 · 活跃日历</p></li>
+                <li><time>2026.09</time><b>改名 windlively</b><p>重写为 Angular</p></li>
+                <li><time>2026.06</time><b>六件工具入住</b><p>OCR · 图片 · JSON …</p></li>
+                <li><time>2020.11</time><b>备案与域名</b><p>小院开张</p></li>
+              </ol>
+            </div>
+            <div class="letter">
+              <p class="poem-source">苏轼 · 浣溪沙</p>
+              <blockquote class="poem">细雨斜风作晓寒，淡烟疏柳媚晴滩。<br>入淮清洛渐漫漫。<br>雪沫乳花浮午盏，蓼茸蒿笋试春盘。<br>人间有味是清欢。</blockquote>
+              <p class="letter-line">这里放着我写的代码、做的小工具，以及一些值得留下的想法。</p>
+              <div class="links">
+                <a href="#notes">博客</a><a href="#works">GitHub</a><a href="#works">Gitee</a><a href="#about">limingjun@example.com</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<footer>
+  <div class="in">
+    <span>windlively · 人间有味是清欢</span>
+    <span class="right">京ICP备20022083号-3</span>
+  </div>
+</footer>
+
+<div class="pv-bar" role="group" aria-label="预览控制">
+  <span class="lab">预览 · 单页 Tab 版</span>
+  <a href="index-scroll.html">对比：长滚动版</a>
+  <span class="hint">小景为矢量绘制 · 手记/作品/年表为占位示例</span>
+</div>
+<div id="cal-tip" role="tooltip" aria-hidden="true"></div>
+
+<script src="build/yard-sprites.js"></script>
+<script>
+/* ================= 矢量元素：精灵数据 → 各 canvas ================= */
+const SP = window.YARD_SPRITES;
+const PAL = SP.palette;
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
+
+function decode(sprite) {
+  const byColor = PAL.map(() => []);
+  for (let y = 0; y < sprite.h; y++) {
+    const s = sprite.runs[y];
+    let x = 0;
+    for (let i = 0; i < s.length; i += 3) {
+      const n = parseInt(s.slice(i, i + 2), 36) + 1;
+      const ci = parseInt(s[i + 2], 36);
+      if (ci !== 35) byColor[ci].push(x, y, n);
+      x += n;
+    }
+  }
+  return byColor;
+}
+function decodeMask(rows) {
+  const out = [];
+  for (let y = 0; y < rows.length; y++) {
+    const s = rows[y];
+    let x = 0;
+    for (let i = 0; i < s.length; i += 3) {
+      const n = parseInt(s.slice(i, i + 2), 36) + 1;
+      if (s[i + 2] === 'a') out.push(x, y, n);
+      x += n;
+    }
+  }
+  return out;
+}
+
+function mount(id, name, scale) {
+  const el = document.getElementById(id);
+  const sp = SP.sprites[name];
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  el.style.width = sp.w * scale + 'px';
+  el.style.height = sp.h * scale + 'px';
+  el.width = Math.round(sp.w * scale * dpr);
+  el.height = Math.round(sp.h * scale * dpr);
+  const ctx = el.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.imageSmoothingEnabled = false;
+  const base = document.createElement('canvas');
+  base.width = el.width;
+  base.height = el.height;
+  const b = base.getContext('2d');
+  b.setTransform(dpr, 0, 0, dpr, 0, 0);
+  if (sp.shadow) {
+    b.fillStyle = 'rgba(52,70,59,.16)';
+    const m = decodeMask(sp.shadow);
+    for (let i = 0; i < m.length; i += 3) b.fillRect(m[i] * scale, m[i + 1] * scale, m[i + 2] * scale, scale);
+  }
+  const byColor = decode(sp);
+  for (let ci = 0; ci < PAL.length; ci++) {
+    b.fillStyle = PAL[ci];
+    const a = byColor[ci];
+    for (let i = 0; i < a.length; i += 3) b.fillRect(a[i] * scale, a[i + 1] * scale, a[i + 2] * scale, scale);
+  }
+  return { ctx, base, scale, w: sp.w, h: sp.h };
+}
+
+const M = {};
+const plain = (m) => { m.ctx.clearRect(0, 0, m.w * m.scale, m.h * m.scale); m.ctx.drawImage(m.base, 0, 0, m.w * m.scale, m.h * m.scale); };
+
+/* 右上角小景：溪流自远岸流向画外 + 一枝手绘垂柳；t 驱动水面高光 */
+const SCENE_W = 288, SCENE_H = 186;
+const Y_FAR = 122, Y_NEAR = 186;
+const SCENE_DAY = {
+  sky: '#f7f2e6', farBank: '#b7c9a6', nearBank: '#c2d3b2', bankHi: '#d5e2c5',
+  waterFar: '#d3e4dd', waterNear: '#93bcbd', ripple: '#bcd4d1',
+  glint: '#eef6f2',
+  bark: '#6b4a35', barkLt: '#83614b', barkDk: '#54392a', twig: '#7c5c41',
+  leaf: '#7e9366', leafLt: '#93a878', leafHi: '#afbf83', leafDeep: '#5f7450',
+};
+const SCENE_NIGHT = {
+  sky: '#202c2a', farBank: '#334038', nearBank: '#3a4a3d', bankHi: '#465744',
+  waterFar: '#4e6366', waterNear: '#2f4045', ripple: '#405459',
+  glint: '#9db6b0',
+  bark: '#4a3a2e', barkLt: '#5a4738', barkDk: '#38291f', twig: '#54402f',
+  leaf: '#576b4f', leafLt: '#64795a', leafHi: '#789063', leafDeep: '#475a41',
+};
+const HALF_AT_BOTTOM = 112, HALF_AT_FAR = 58;
+const waterHalf = (y) => y >= Y_NEAR ? HALF_AT_BOTTOM
+  : HALF_AT_FAR + (HALF_AT_BOTTOM - HALF_AT_FAR) * Math.pow((y - Y_FAR) / (Y_NEAR - Y_FAR), 1.15);
+const inWater = (x, y) => y >= Y_FAR && Math.abs(x - SCENE_W / 2) < waterHalf(y) - 6;
+const waterT = (y) => Math.max(0, Math.min(1, (y - Y_FAR) / (Y_NEAR - Y_FAR)));
+const hexLerp = (a, b, k) => {
+  const pa = [1, 3, 5].map(i => parseInt(a.slice(i, i + 2), 16));
+  const pb = [1, 3, 5].map(i => parseInt(b.slice(i, i + 2), 16));
+  const out = pa.map((v, i) => Math.round(v + (pb[i] - v) * k).toString(16).padStart(2, '0'));
+  return '#' + out.join('');
+};
+
+function drawScene(t) {
+  const c = M.scene;
+  if (!c) return;
+  const night = document.body.classList.contains('night');
+  const P = night ? SCENE_NIGHT : SCENE_DAY;
+  const px = (x, y, w, h, col) => { c.fillStyle = col; c.fillRect(x, y, w, h); };
+  c.clearRect(0, 0, SCENE_W, SCENE_H);
+
+  /* 溪流：远岸在 Y_FAR，水面向观者张开（近处出水），岸坡分列左右 */
+  px(0, 110, SCENE_W, 12, P.farBank);
+  px(0, 110, SCENE_W, 2, P.bankHi);
+  for (let y = Y_FAR; y < Y_NEAR; y++) {
+    const hw = waterHalf(y);
+    px(0, y, SCENE_W / 2 - hw, 1, P.nearBank);
+    px(SCENE_W / 2 + hw, y, SCENE_W / 2 - hw, 1, P.nearBank);
+    px(SCENE_W / 2 - hw, y, hw * 2, 1, hexLerp(P.waterFar, P.waterNear, waterT(y)));
+    /* 横向波纹：斜着错开的短纹，越近越长，帮读“水从远处流来” */
+    if (y % 4 !== 0) continue;
+    const t = waterT(y);
+    const seed = ((y * 37) % 11) / 11;
+    c.globalAlpha = .5 + t * .3;
+    px(SCENE_W / 2 - hw * (.1 + seed * .5), y, Math.max(2, hw * (.34 + t * .4)), 1, P.ripple);
+    if (t > .35) px(SCENE_W / 2 + hw * (.05 + seed * .3), y + 2, Math.max(3, hw * (.3 + t * .3)), 1, P.ripple);
+    c.globalAlpha = 1;
+  }
+  /* 岸边草色点缀：贴着水沿错落（近处更密，帮读纵深） */
+  const bankDots = [[46, 130, 3], [34, 140, 2], [22, 152, 3], [12, 164, 2], [6, 176, 4],
+    [238, 131, 3], [250, 140, 2], [262, 152, 3], [272, 164, 2], [278, 176, 4], [282, 186, 4]];
+  for (const [x, y, w] of bankDots) px(x, y, w, 1, P.bankHi);
+
+  /* 水面高光：越近越长、越快（缓慢向右漂移） */
+  const glints = [[70, 128, 4, 0], [180, 134, 6, 3], [96, 143, 8, 1], [206, 149, 10, 4],
+    [58, 160, 13, 2], [176, 166, 17, 0], [232, 175, 20, 3], [110, 179, 15, 1]];
+  for (const [x0, y, len, k] of glints) {
+    if (!inWater(x0, y)) continue;
+    const x = ((x0 + t * (5 + k * 2.2)) % (SCENE_W + len * 2)) - len;
+    c.globalAlpha = .30 + waterT(y) * .25;
+    px(Math.round(x), y, len, 1, P.glint);
+    c.globalAlpha = 1;
+  }
+
+  const resample = (pts) => {
+    const out = [];
+    for (let i = 0; i < pts.length - 1; i++) {
+      const [x0, y0] = pts[i], [x1, y1] = pts[i + 1];
+      const n = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0));
+      for (let j = 0; j <= n; j++) out.push([x0 + (x1 - x0) * j / n, y0 + (y1 - y0) * j / n]);
+    }
+    return out;
+  };
+  const widthAt = (wid, i, n) => wid[0] + (wid[1] - wid[0]) * (i / n);
+
+  /* 柳树：干栽近岸（右岸），主枝向左斜伸过溪，枝上垂下细柳条 */
+  const trunkPts = resample([[254, 186], [253, 178], [253, 168], [251, 156], [248, 142], [244, 126], [240, 110], [238, 96], [238, 84], [240, 74], [244, 66]]);
+  for (let i = 0; i < trunkPts.length; i++) {
+    const [fx, fy] = trunkPts[i];
+    const w = Math.max(1, Math.round(widthAt([11, 4], i, trunkPts.length - 1)));
+    const x = Math.round(fx) - (w >> 1);
+    px(x, Math.round(fy), w, 1, P.bark);
+    px(x, Math.round(fy), 1, 1, P.barkDk);
+    px(x + w - 1, Math.round(fy), 1, 1, P.barkLt);
+    if (i % 7 === 4 && w > 3) px(x + 1 + ((i / 7) | 0) % 2, Math.round(fy), 1, 1, P.barkDk);
+  }
+  px(248, 182, 12, 4, P.bark); px(254, 180, 8, 4, P.bark);
+  px(252, 184, 10, 3, P.barkDk); px(246, 186, 30, 2, P.bark);
+
+  const limb = (pts, wid) => {
+    const rs = resample(pts);
+    for (let i = 0; i < rs.length; i++) {
+      const w = Math.max(1, Math.round(widthAt(wid, i, rs.length - 1)));
+      px(Math.round(rs[i][0]), Math.round(rs[i][1]), w, 1, P.twig);
+    }
+    return rs;
+  };
+  const main = [[244, 66], [230, 54], [210, 46], [186, 42], [160, 44], [134, 48], [110, 54], [88, 60], [70, 68]];
+  limb(main, [3, 1]);
+  limb([[244, 72], [254, 62], [262, 58]], [2, 1]);
+  limb([[240, 90], [222, 78], [206, 68]], [2, 1]);
+  limb([[234, 102], [214, 94], [192, 92]], [2, 1]);
+  limb([[246, 128], [260, 116], [272, 110]], [2, 1]);
+
+  const res = resample(main);
+  const mainAt = (x) => {
+    let best = 60, bd = 1e9;
+    for (const [rx, ry] of res) { const d = Math.abs(rx - x); if (d < bd) { bd = d; best = ry; } }
+    return Math.round(best);
+  };
+
+  const catkin = (x0, drop, ph, curve) => {
+    const yStart = mainAt(x0) + 1;
+    const pal = [P.leafHi, P.leafLt, P.leaf, P.leafHi, P.leafDeep, P.leafLt];
+    for (let i = 0; i < drop; i++) {
+      const u = i / drop;
+      const arc = Math.round(curve * u * u * 3);
+      const sway = Math.abs(Math.sin(t * 0.85 + ph + i * 0.07)) > 0.78 ? 1 : 0;
+      const x = x0 + arc + sway;
+      const y = yStart + i;
+      const col = i < 3 ? P.leafLt : i > drop - 6 ? P.leaf : pal[(i + ((ph * 3) | 0)) % pal.length];
+      px(x, y, 1, 1, col);
+      if (i > 2 && i < drop - 3 && i % 4 !== 3) px(x + 1, y, 1, 1, pal[(i * 2 + 1) % pal.length]);
+      if (i > 5 && i < drop - 3 && i % 7 === 5) px(x, y + 1, 1, 1, pal[(i + 3) % pal.length]);
+    }
+  };
+  const strands = [
+    [72, 30, 0.6, 1], [81, 46, 1.1, 1], [88, 34, 1.6, 1], [76, 22, 2.0, 0],
+    [98, 44, 2.4, 1], [107, 50, 2.9, 0], [114, 38, 3.4, 1], [102, 26, 3.8, 0],
+    [124, 46, 4.2, 1], [133, 54, 4.7, 1], [140, 40, 5.2, 0], [129, 28, 5.6, 0],
+    [150, 48, 6.0, 1], [159, 58, 6.5, 1], [166, 42, 7.0, 0], [155, 30, 7.4, 0],
+    [176, 50, 7.8, 1], [185, 60, 8.3, 0], [192, 44, 8.8, 0], [181, 32, 9.2, 1],
+    [202, 52, 9.6, 0], [211, 56, 10.1, 0], [218, 40, 10.6, 1], [207, 30, 11.0, 0],
+    [230, 36, 11.6, 0],
+  ];
+  for (const [x, d, ph, cv] of strands) catkin(x, d, ph, cv);
+  for (const [x, y0, d, ph] of [[206, 70, 22, 3.2], [220, 83, 24, 6.8], [250, 104, 18, 2.2]]) {
+    for (let i = 0; i < d; i++) {
+      const sway = Math.abs(Math.sin(t * .85 + ph + i * .07)) > .78 ? 1 : 0;
+      px(x + sway, y0 + i, 1, 1, i > d - 5 ? P.leaf : P.leafHi);
+    }
+  }
+
+  /* 近水柳条在水面拉出淡影：越往下越淡（水越深） */
+  for (const [x, d] of strands) {
+    const yEnd = mainAt(x) + 1 + d;
+    if (!inWater(x, yEnd)) continue;
+    for (let i = 0, ry = yEnd + 2; i < 24 && ry < Y_NEAR; i++, ry++) {
+      if (!inWater(x, ry)) break;
+      c.globalAlpha = Math.max(.05, .30 - i * .018);
+      px(x, ry, 1, 1, P.leafDeep);
+    }
+  }
+  c.globalAlpha = 1;
+}
+
+function renderAll() {
+  M.cat = mount('sp-cat', 'cat', 1);
+  M.catM = mount('sp-cat-m', 'cat', 1);
+  [M.cat, M.catM].forEach(plain);
+  const sc = document.getElementById('sp-scene');
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  sc.style.width = SCENE_W + 'px';
+  sc.style.height = SCENE_H + 'px';
+  sc.width = SCENE_W * dpr;
+  sc.height = SCENE_H * dpr;
+  const ctx = sc.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  M.scene = ctx;
+  drawScene(0);
+}
+
+let raf = 0;
+function frame(now) {
+  const t = now / 1000;
+  drawScene(t);
+  if (!reduceMotion.matches && !document.hidden) raf = requestAnimationFrame(frame);
+}
+function start() {
+  cancelAnimationFrame(raf);
+  if (reduceMotion.matches || document.hidden) { drawScene(0); }
+  else raf = requestAnimationFrame(frame);
+}
+function sync() { renderAll(); start(); }
+
+document.querySelectorAll('.card[data-tool]').forEach(a => a.addEventListener('click', e => e.preventDefault()));
+
+matchMedia('(prefers-reduced-motion: reduce)').addEventListener?.('change', sync);
+window.addEventListener('resize', sync);
+document.addEventListener('visibilitychange', () => { if (document.hidden) cancelAnimationFrame(raf); else start(); });
+
+/* ================= 单页 Tab 切换 ================= */
+const tabBtns = [...document.querySelectorAll('.tab')];
+function setTab(name) {
+  if (!document.getElementById('p-' + name)) return;
+  tabBtns.forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === name)));
+  document.querySelectorAll('.panel').forEach(p => p.classList.toggle('is-active', p.id === 'p-' + name));
+  document.getElementById('cal-tip').style.display = 'none';
+  history.replaceState(null, '', '#' + name);
+}
+tabBtns.forEach(b => b.addEventListener('click', () => setTab(b.dataset.tab)));
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  if (document.getElementById('p-' + id)) a.addEventListener('click', e => { e.preventDefault(); setTab(id); });
+});
+
+/* ================= 活跃日历（示例数据） ================= */
+function genDays() {
+  const start = new Date(2025, 9, 13);
+  const today = new Date(2026, 9, 10);
+  let seed = 20261011;
+  const rnd = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; };
+  const days = [];
+  for (let i = 0; i < 371; i++) {
+    const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+    const dow = (d.getDay() + 6) % 7;
+    let c = 0;
+    const vac1 = d >= new Date(2026, 0, 28) && d <= new Date(2026, 1, 8);
+    const vac2 = d >= new Date(2026, 7, 8) && d <= new Date(2026, 7, 19);
+    if (!vac1 && !vac2) {
+      c = rnd() < (dow < 5 ? .62 : .38) ? 1 + Math.floor(rnd() * (dow < 5 ? 5 : 3)) : 0;
+      if (rnd() < .05) c += 6 + Math.floor(rnd() * 7);
+    }
+    if (d >= new Date(2026, 2, 16) && d <= new Date(2026, 3, 12)) c = Math.max(c, 1 + Math.floor(rnd() * 3));
+    days.push({ d, c, f: d > today });
+  }
+  return days;
+}
+const DAYS = genDays();
+const past = DAYS.filter(x => !x.f);
+const total = past.reduce((s, x) => s + x.c, 0);
+let streak = 0, best = 0;
+for (const x of past) { streak = x.c > 0 ? streak + 1 : 0; if (streak > best) best = streak; }
+const MONTHS = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+const level = c => c === 0 ? 0 : c <= 2 ? 1 : c <= 5 ? 2 : c <= 9 ? 3 : 4;
+const tip = document.getElementById('cal-tip');
+
+function buildCalendar(host, weeks) {
+  const slice = DAYS.slice(DAYS.length - weeks * 7);
+  const box = document.createElement('div'); box.className = 'cal-row';
+  const cap = document.createElement('div'); cap.className = 'cal-cap';
+  const kicker = document.createElement('span'); kicker.className = 'hc-kicker';
+  kicker.textContent = 'FOOTPRINTS · 活跃足迹';
+  const sum = document.createElement('span'); sum.className = 'sum';
+  sum.innerHTML = `过去一年 <b>${total}</b> 次提交 · 最长连续 <b>${best}</b> 天`;
+  const note = document.createElement('span'); note.className = 'cal-note';
+  note.textContent = '悬停看单日 · 示例数据';
+  cap.append(kicker, sum, note);
+
+  const scroll = document.createElement('div'); scroll.className = 'cal-scroll';
+  const cal = document.createElement('div'); cal.className = 'cal';
+  const wkd = document.createElement('div'); wkd.className = 'cal-weeks';
+  ['一','','三','','五','',''].forEach(t => { const s = document.createElement('span'); s.textContent = t; wkd.appendChild(s); });
+  const body = document.createElement('div'); body.className = 'cal-body';
+  const months = document.createElement('div'); months.className = 'cal-months';
+  months.style.gridTemplateColumns = `repeat(${weeks},10px)`;
+  const grid = document.createElement('div'); grid.className = 'cal-grid'; grid.setAttribute('role', 'img');
+  grid.setAttribute('aria-label', `过去一年 ${total} 次提交，最长连续 ${best} 天（示例数据）`);
+  let lastMonth = -1, lastLabelW = -9;
+  for (let w = 0; w < weeks; w++) {
+    const monday = slice[w * 7].d.getMonth();
+    const label = document.createElement('span');
+    if (monday !== lastMonth) {
+      lastMonth = monday;
+      if (w - lastLabelW >= 2) { label.textContent = MONTHS[monday]; lastLabelW = w; }
+    }
+    months.appendChild(label);
+    for (let r = 0; r < 7; r++) {
+      const day = slice[w * 7 + r];
+      const c = document.createElement('i'); c.className = 'c' + (day.f ? ' f' : '');
+      c.setAttribute('aria-hidden', 'true');
+      if (!day.f) {
+        c.dataset.l = level(day.c);
+        c.dataset.tip = `${day.d.toLocaleDateString('sv')} · ${day.c === 0 ? '无提交' : day.c + ' 次提交'}`;
+      }
+      grid.appendChild(c);
+    }
+  }
+  grid.addEventListener('mouseover', e => {
+    const c = e.target.closest('.c[data-tip]');
+    if (!c) { tip.style.display = 'none'; return; }
+    tip.textContent = c.dataset.tip; tip.style.display = 'block';
+    const r = c.getBoundingClientRect();
+    tip.style.left = Math.min(window.innerWidth - tip.offsetWidth - 8, Math.max(8, r.left + r.width / 2 - tip.offsetWidth / 2)) + 'px';
+    tip.style.top = Math.max(8, r.top - tip.offsetHeight - 6) + 'px';
+  });
+  grid.addEventListener('mouseleave', () => { tip.style.display = 'none'; });
+
+  body.append(months, grid);
+  cal.append(wkd, body);
+  scroll.appendChild(cal);
+  const legend = document.createElement('div'); legend.className = 'cal-legend';
+  legend.innerHTML = '<span>少</span><i class="c"></i><i class="c" data-l="1"></i><i class="c" data-l="2"></i><i class="c" data-l="3"></i><i class="c" data-l="4"></i><span>多</span>';
+  cap.append(legend);
+  box.append(cap, scroll);
+  host.appendChild(box);
+}
+buildCalendar(document.getElementById('cal-host'), 53);
+
+/* 作品页签（预览示意） */
+document.querySelectorAll('.tab2').forEach(t => t.addEventListener('click', () => {
+  document.querySelectorAll('.tab2').forEach(x => x.setAttribute('aria-pressed', String(x === t)));
+}));
+
+/* 昼夜主题：默认浅色（夜间皮肤 body.night 保留在 CSS 里，站点落地时再接开关/时段策略） */
+
+/* 初始页签：#tools 或 hash 里的模块 */
+const initTab = (location.hash || '#tools').slice(1);
+setTab(document.getElementById('p-' + initTab) ? initTab : 'tools');
+sync();
+</script>
+</body>
+</html>

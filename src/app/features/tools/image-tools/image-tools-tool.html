@@ -1,0 +1,148 @@
+<app-tool-head toolId="image-tools" />
+
+<div class="glass body">
+  <app-tabs [tabs]="tabs" [value]="tab()" (valueChange)="tab.set($any($event))" />
+
+  @if (tab() === 'base64') {
+    <div class="mode-switch">
+      <app-tabs [tabs]="b64Tabs" [value]="b64Mode()" (valueChange)="b64Mode.set($any($event))" />
+    </div>
+
+    @if (b64Mode() === 'encode') {
+      <div class="grid">
+        <app-drop-zone
+          hint="拖拽图片到此处，或点击选择"
+          sub="生成 DataURL（Base64）文本"
+          (picked)="onEncodeFile($event)"
+        />
+        <div class="pane">
+          @if (dataUrl()) {
+            <div class="meta">
+              <img
+                class="thumb"
+                [src]="dataUrl()"
+                alt="预览"
+                role="button"
+                tabindex="0"
+                (click)="openEncodePreview()"
+                (keydown.enter)="openEncodePreview()"
+                (keydown.space)="$event.preventDefault(); openEncodePreview()"
+              />
+              <ul class="info subtle">
+                <li>文件名：{{ encodeInfo()?.name }}</li>
+                <li>原始大小：{{ encodeInfo() ? formatBytes(encodeInfo()!.size) : '' }}</li>
+                <li>图片尺寸：{{ encodeInfo()?.width }} × {{ encodeInfo()?.height }}</li>
+                <li>Base64 长度：{{ dataUrl().length }} 字符</li>
+              </ul>
+            </div>
+            <textarea class="out mono" readonly [value]="dataUrl()" aria-label="Base64 输出"></textarea>
+            <div class="actions">
+              <app-copy-button [text]="dataUrl()" label="复制 Base64" />
+              <button type="button" class="btn btn-sm" (click)="openEncodePreview()">大图预览</button>
+            </div>
+          } @else {
+            <p class="placeholder subtle">选择图片后，这里将生成 Base64 文本</p>
+          }
+        </div>
+      </div>
+    } @else {
+      <div class="grid">
+        <div class="pane">
+          <textarea
+            class="out mono"
+            [value]="decodeInput()"
+            (input)="onDecodeInput($any($event.target).value)"
+            placeholder="粘贴 data:image/...;base64,xxxx 内容"
+            spellcheck="false"
+            aria-label="Base64 输入"
+          ></textarea>
+          @if (decodeError()) {
+            <p class="err-note" role="alert">{{ decodeError() }}</p>
+          } @else {
+            <p class="hint subtle">支持带 data:image/...;base64, 前缀的完整 DataURL</p>
+          }
+        </div>
+        <div class="pane">
+          @if (decodeSrc()) {
+            <img class="thumb big" [src]="decodeSrc()" alt="解码预览" />
+            <ul class="info subtle">
+              <li>类型：{{ decodeInfo()?.type }}</li>
+              <li>大小：{{ decodeInfo() ? formatBytes(decodeInfo()!.size) : '' }}</li>
+            </ul>
+            <div class="actions">
+              <button type="button" class="btn btn-sm btn-primary" (click)="downloadDecoded()">
+                <app-icon name="download" [size]="15" /> 下载图片
+              </button>
+            </div>
+          } @else {
+            <p class="placeholder subtle">粘贴 Base64 后这里将显示图片</p>
+          }
+        </div>
+      </div>
+    }
+  } @else {
+    <div class="grid">
+      <div class="left-col">
+        <app-drop-zone
+          hint="拖拽图片到此处，或点击选择"
+          sub="支持转换 WebP / JPEG / PNG"
+          (picked)="onConvertFile($event)"
+        />
+        @if (sourceInfo()) {
+          <ul class="info subtle">
+            <li>文件名：{{ sourceInfo()?.name }}</li>
+            <li>原始大小：{{ sourceInfo() ? formatBytes(sourceInfo()!.size) : '' }}</li>
+            <li>原始类型：{{ sourceInfo()?.type }}</li>
+          </ul>
+        }
+      </div>
+      <div class="pane">
+        <div class="opt-row">
+          <app-tabs [tabs]="targetTabs" [value]="targetType()" (valueChange)="onTargetChange($event)" />
+        </div>
+        @if (targetType() !== 'image/png') {
+          <label class="quality">
+            <span class="subtle">质量 {{ (quality() * 100).toFixed(0) }}%</span>
+            <input
+              type="range"
+              min="0.4"
+              max="1"
+              step="0.02"
+              [value]="quality()"
+              (input)="onQualityChange($event)"
+              aria-label="导出质量"
+            />
+          </label>
+        }
+        @if (convertedSrc()) {
+          <img
+            class="thumb big"
+            [src]="convertedSrc()"
+            alt="转换预览"
+            role="button"
+            tabindex="0"
+            (click)="openConvertPreview()"
+            (keydown.enter)="openConvertPreview()"
+            (keydown.space)="$event.preventDefault(); openConvertPreview()"
+          />
+          <div class="actions">
+            <span class="subtle size-note">
+              {{ formatBytes(convertedSize()) }}
+              <span [class.up]="sizeDelta().startsWith('+')">{{ sizeDelta() }}</span>
+            </span>
+            <app-copy-button [text]="convertedSrc()" label="复制 DataURL" />
+            <button type="button" class="btn btn-sm btn-primary" (click)="downloadConverted()">
+              <app-icon name="download" [size]="15" /> 下载
+            </button>
+          </div>
+        } @else if (sourceInfo()) {
+          <p class="placeholder subtle">正在转换……</p>
+        } @else {
+          <p class="placeholder subtle">选择图片并指定目标格式后，这里将显示转换结果</p>
+        }
+      </div>
+    </div>
+  }
+
+  <app-lightbox [src]="lightboxSrc()" (closed)="lightboxSrc.set(null)" />
+</div>

@@ -1,0 +1,168 @@
+<app-tool-head toolId="lab" />
+
+<div class="glass body">
+  <app-tabs [tabs]="tabs" [value]="tab()" (valueChange)="tab.set($event)" />
+
+  @if (tab() === 'signals') {
+    <div class="grid">
+      <div class="demo">
+        <h3>signal / computed / effect</h3>
+        <div class="row">
+          <button type="button" class="btn btn-sm" (click)="dec()">-1</button>
+          <span class="big mono">{{ count() }}</span>
+          <button type="button" class="btn btn-sm" (click)="inc()">+1</button>
+          <button type="button" class="btn btn-sm" (click)="resetCount()">重置</button>
+        </div>
+        <ul class="facts">
+          <li>count()：<strong class="mono">{{ count() }}</strong></li>
+          <li>computed 双倍：<strong class="mono">{{ double() }}</strong></li>
+          <li>奇偶：<strong class="mono">{{ even() ? '偶数' : '奇数' }}</strong></li>
+        </ul>
+        <div class="log">
+          <span class="subtle">effect 日志：</span>
+          <ol>
+            @for (line of log(); track $index) {
+              <li class="mono">{{ line }}</li>
+            }
+          </ol>
+        </div>
+      </div>
+      <pre class="snippet mono">{{ snippetSignals }}</pre>
+    </div>
+  }
+
+  @if (tab() === 'flow') {
+    <div class="grid">
+      <div class="demo">
+        <h3>&#64;if / &#64;switch</h3>
+        <div class="row">
+          <button type="button" class="btn btn-sm" (click)="showDetail.set(!showDetail())">
+            {{ showDetail() ? '隐藏详情' : '显示详情' }}
+          </button>
+          <select [value]="status()" (change)="onStatus($event)" aria-label="任务状态">
+            <option value="idle">idle</option>
+            <option value="running">running</option>
+            <option value="done">done</option>
+          </select>
+        </div>
+        @if (showDetail()) {
+          <p class="detail">条件渲染的内容：这段文字由 &#64;if 控制。</p>
+        }
+        <p class="detail">
+          @switch (status()) {
+            @case ('idle') {
+              <span class="tag">空闲</span>
+            }
+            @case ('running') {
+              <span class="tag running">执行中…</span>
+            }
+            @case ('done') {
+              <span class="tag done">已完成</span>
+            }
+            @default {
+              <span class="tag">未知</span>
+            }
+          }
+        </p>
+
+        <h3>&#64;for 列表</h3>
+        <div class="row">
+          <input
+            type="text"
+            placeholder="添加一条待办，回车确认"
+            (keydown.enter)="addTodo($any($event.target))"
+            aria-label="新待办"
+          />
+          @for (f of ['all', 'active', 'done']; track f) {
+            <button
+              type="button"
+              class="chip"
+              [class.active]="filter() === f"
+              (click)="setFilter($any(f))"
+            >
+              {{ f === 'all' ? '全部' : f === 'active' ? '未完成' : '已完成' }}
+            </button>
+          }
+        </div>
+        <ul class="todos">
+          @for (t of visibleTodos(); track t.id) {
+            <li [class.done]="t.done">
+              <button type="button" class="check" (click)="toggleTodo(t.id)" [attr.aria-pressed]="t.done">
+                <app-icon [name]="t.done ? 'check' : 'close'" [size]="13" />
+              </button>
+              <span class="text">{{ t.text }}</span>
+              <button type="button" class="del" (click)="removeTodo(t.id)" aria-label="删除">
+                <app-icon name="trash" [size]="14" />
+              </button>
+            </li>
+          } @empty {
+            <li class="subtle">没有符合条件的待办</li>
+          }
+        </ul>
+        <p class="subtle">剩余 {{ remaining() }} 项未完成</p>
+      </div>
+      <pre class="snippet mono">{{ snippetFlow }}</pre>
+    </div>
+  }
+
+  @if (tab() === 'directives') {
+    <div class="grid">
+      <div class="demo">
+        <h3>自定义属性指令</h3>
+        <p class="subtle">移动鼠标到下面的卡片上，高光会跟随光标。</p>
+        <div class="glow-card" appGlow>
+          <app-icon name="sparkles" [size]="22" />
+          <p>appGlow 指令演示</p>
+        </div>
+      </div>
+      <pre class="snippet mono">{{ snippetDirective }}</pre>
+    </div>
+  }
+
+  @if (tab() === 'pipes') {
+    <div class="grid">
+      <div class="demo">
+        <h3>内置管道</h3>
+        <ul class="facts">
+          <li>
+            实时时间（date）：
+            <strong class="mono">{{ now() | date: 'yyyy-MM-dd HH:mm:ss' }}</strong>
+          </li>
+          <li>
+            数字格式化（number）：
+            <strong class="mono">{{ amount() | number: '1.2-2' }}</strong>
+          </li>
+          <li>
+            货币（currency）：
+            <strong class="mono">{{ amount() | currency: 'CNY' : 'symbol' : '1.0-2' }}</strong>
+          </li>
+          <li>
+            百分比（percent）：
+            <strong class="mono">{{ 0.8567 | percent: '1.1-1' }}</strong>
+          </li>
+        </ul>
+        <h3>自定义管道</h3>
+        <ul class="facts">
+          <li>
+            rate（×8）：
+            <strong class="mono">{{ 42 | rate: 8 }}</strong>
+          </li>
+          <li>
+            strToNumber：
+            <input
+              class="inline-input mono"
+              type="text"
+              inputmode="decimal"
+              [value]="rawNumber()"
+              (input)="setRawNumber($event)"
+              aria-label="字符串转数字输入"
+            />
+            →
+            <strong class="mono">{{ (rawNumber() | strToNumber) ?? '无效数字' }}</strong>
+          </li>
+        </ul>
+      </div>
+      <pre class="snippet mono">{{ snippetPipes }}</pre>
+    </div>
+  }
+</div>

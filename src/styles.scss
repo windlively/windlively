@@ -1,0 +1,364 @@
+:root {
+  /* 配色以 Codex「清欢手札」稿为准 */
+  --paper: #f5f0e3;
+  --card: rgba(255, 253, 247, 0.76);
+  --card-hi: #fffdf7;
+  --ink: #243a32;
+  --muted: #79877a;
+  --moss: #667c61;
+  --sage: #dce6d5;
+  --sage-deep: #aabb9e;
+  --clay: #cb8062;
+  --butter: #eac976;
+  --line: rgba(54, 76, 61, 0.13);
+  --sh-card: 0 8px 28px rgba(61, 68, 47, 0.05);
+  --sh3: 0 10px 30px rgba(61, 68, 47, 0.07);
+  --sh5: 0 18px 46px rgba(61, 68, 47, 0.1);
+  --shadow: 0 16px 44px rgba(61, 68, 47, 0.08);
+  --cal0: rgba(54, 76, 61, 0.1);
+  --cal1: #dce6d5;
+  --cal2: #aabb9e;
+  --cal3: #667c61;
+  --cal4: #243a32;
+  --serif: 'Songti SC', 'Noto Serif SC', 'Source Han Serif SC', serif;
+  --sans: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', -apple-system, sans-serif;
+  --mono: ui-monospace, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+
+  /* 工具页别名令牌（取值为小院配色，沿用旧工具页里的变量名） */
+  --paper-2: #f7f2e6;
+  --text-1: var(--ink);
+  --text-2: var(--muted);
+  --text-3: #6d7b6e;
+  --glass-border: var(--line);
+  --line-strong: rgba(54, 76, 61, 0.26);
+  --radius-lg: 0;
+  --radius-md: 0;
+  --radius-sm: 0;
+  --accent-1: var(--moss);
+  --accent-2: var(--sage-deep);
+  --accent-3: var(--clay);
+  --moss-deep: #33492f;
+  --willow: var(--sage);
+  --willow-deep: var(--sage-deep);
+  --danger: #a8503f;
+  --danger-soft: rgba(203, 128, 98, 0.16);
+  --bg-surface: var(--card-hi);
+  --font-sans: var(--sans);
+  --font-serif: var(--serif);
+  --font-mono: var(--mono);
+  --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+  /* 松手回弹（过冲约 40%），按下去用快速 ease-out 覆盖 */
+  --bounce: cubic-bezier(0.34, 2.4, 0.64, 1);
+  --dur: 0.18s;
+  --page-max: 1150px;
+  --sh-btn: 0 5px 14px rgba(61, 68, 47, 0.12);
+  --sh-btn-hi: 0 9px 20px rgba(61, 68, 47, 0.16);
+  --sh-btn-down: 0 2px 6px rgba(61, 68, 47, 0.1);
+  --code-str: #4e6b4a;
+  --code-num: #9c5a3c;
+  --code-bool: #5a5f8e;
+}
+
+* {
+  box-sizing: border-box;
+  border-radius: 0;
+}
+html {
+  height: 100%;
+}
+body {
+  margin: 0;
+  min-height: 100%;
+  background-color: var(--paper);
+  background-image: radial-gradient(rgba(93, 112, 79, 0.11) 0.65px, transparent 0.65px);
+  background-size: 8px 8px;
+  color: var(--ink);
+  font:
+    16px/1.75 var(--sans);
+  display: flex;
+  flex-direction: column;
+  transition: background-color 0.45s, color 0.45s;
+}
+::selection {
+  background: var(--sage);
+  color: var(--ink);
+}
+:focus-visible {
+  outline: 2px solid var(--moss);
+  outline-offset: 2px;
+}
+a {
+  color: var(--ink);
+  text-underline-offset: 3px;
+}
+img,
+svg {
+  display: block;
+}
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+  margin: 0;
+}
+
+/* 昼夜主题（取值同样以 Codex 稿为准；站点默认浅色，夜间皮肤留待接入开关） */
+body.night {
+  color-scheme: dark;
+  --paper: #202c2a;
+  --card: rgba(44, 58, 49, 0.82);
+  --card-hi: #34483b;
+  --ink: #e8e5d6;
+  --muted: #a6b2a2;
+  --moss: #8ca185;
+  --sage: #35443a;
+  --sage-deep: #596b55;
+  --clay: #c4876c;
+  --butter: #eac976;
+  --line: rgba(229, 231, 206, 0.15);
+  --sh-card: 0 8px 28px rgba(0, 0, 0, 0.18);
+  --sh3: 0 10px 30px rgba(0, 0, 0, 0.16);
+  --sh5: 0 18px 46px rgba(0, 0, 0, 0.24);
+  --shadow: 0 16px 44px rgba(0, 0, 0, 0.15);
+  --cal0: rgba(229, 231, 206, 0.06);
+  --cal1: #455847;
+  --cal2: #617763;
+  --cal3: #88a281;
+  --cal4: #c9d9bb;
+  background-image: radial-gradient(rgba(221, 223, 190, 0.11) 0.65px, transparent 0.65px);
+
+  /* 工具页别名（夜间取值） */
+  --paper-2: #26332f;
+  --text-3: #97a493;
+  --line-strong: rgba(229, 231, 206, 0.32);
+  --moss-deep: #a9c19a;
+  --danger: #d89478;
+  --danger-soft: rgba(212, 140, 110, 0.2);
+  --sh-btn: 0 5px 14px rgba(0, 0, 0, 0.22);
+  --sh-btn-hi: 0 9px 20px rgba(0, 0, 0, 0.28);
+  --sh-btn-down: 0 2px 6px rgba(0, 0, 0, 0.18);
+  --code-str: #a3bd93;
+  --code-num: #e0a184;
+  --code-bool: #a8aed6;
+}
+body.night .scene,
+body.night .avatar {
+  background: #3d5147;
+}
+body.night .scene-line,
+body.night .greet-scene::after {
+  background: linear-gradient(90deg, transparent, rgba(229, 231, 206, 0.2) 12%, rgba(229, 231, 206, 0.2) 88%, transparent);
+}
+body.night .tab {
+  background: #34483b;
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.22);
+}
+body.night .tab:hover {
+  box-shadow: 0 9px 20px rgba(0, 0, 0, 0.28);
+}
+body.night .tab[aria-selected='true'] {
+  background: #455643;
+}
+body.night .tab2[aria-pressed='false'] {
+  background: rgba(43, 58, 49, 0.82);
+}
+body.night .ico {
+  background: #455643;
+  color: #d0d9bf;
+}
+body.night .w-tag {
+  background: #3d4c40;
+  color: #c0cdb8;
+}
+body.night .quote-card {
+  background: #4a4034;
+}
+body.night .quote-card::after {
+  color: rgba(214, 160, 120, 0.13);
+}
+body.night .q-label,
+body.night .kicker,
+body.night .hc-kicker {
+  color: #c9a283;
+}
+body.night .q-text,
+body.night .q-sign {
+  color: #e2c5a6;
+}
+body.night .letter .poem {
+  color: #b6c0ad;
+}
+body.night .letter .poem-source {
+  color: #c9a283;
+}
+
+/* ============================================================
+   工具页基础（/tools/*）：按钮 / 表单 / 卡片 / 文本
+   类名沿用旧工具页，取值为小院配色；Monaco 内部控件不受影响
+   ============================================================ */
+.mono {
+  font-family: var(--mono);
+}
+.subtle,
+.muted {
+  color: var(--muted);
+}
+.spacer {
+  flex: 1;
+}
+.glass {
+  background: var(--card-hi);
+  box-shadow: var(--sh-card);
+}
+.placeholder {
+  color: var(--muted);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 9px 16px;
+  border: 0;
+  background: var(--card-hi);
+  color: var(--ink);
+  box-shadow: var(--sh-btn);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  transition:
+    transform 0.4s var(--bounce),
+    box-shadow 0.4s var(--bounce),
+    background 0.2s;
+}
+.btn:hover:not([disabled]) {
+  transform: translateY(-2px);
+  box-shadow: var(--sh-btn-hi);
+}
+.btn:active:not([disabled]) {
+  transform: translateY(3px) scale(0.93);
+  box-shadow: var(--sh-btn-down);
+  transition-duration: 0.06s;
+  transition-timing-function: ease-out;
+}
+.btn[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.btn-primary {
+  background: var(--ink);
+  color: var(--paper);
+}
+.btn-primary:hover:not([disabled]) {
+  background: var(--moss-deep);
+}
+.btn-sm {
+  min-height: 36px;
+  padding: 6px 12px;
+  font-size: 13px;
+}
+.btn-icon {
+  min-width: 36px;
+  padding: 6px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 6px 13px;
+  border: 1px solid var(--line);
+  background: var(--card-hi);
+  color: var(--muted);
+  font: inherit;
+  font-size: 13.5px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background 0.2s,
+    color 0.2s,
+    border-color 0.2s,
+    transform 0.4s var(--bounce);
+}
+.chip:hover {
+  border-color: var(--sage-deep);
+  color: var(--ink);
+  transform: translateY(-1px);
+}
+.chip.active,
+.chip[aria-selected='true'] {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--paper);
+}
+.chip:active {
+  transform: translateY(2px) scale(0.92);
+  transition-duration: 0.06s;
+  transition-timing-function: ease-out;
+}
+
+.badge {
+  font-size: 12px;
+  padding: 3px 10px;
+}
+.badge.ok {
+  color: var(--moss-deep);
+  background: var(--willow);
+}
+.badge.error {
+  color: var(--danger);
+  background: var(--danger-soft);
+}
+
+/* 表单基座：移动端聚焦不触发自动放大（组件可覆盖字号）；Monaco 内部输入框除外 */
+.glass :where(input, textarea, select):not(:where(.monaco-editor *)) {
+  background: var(--card-hi);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  padding: 9px 12px;
+  font: inherit;
+  transition:
+    border-color 0.18s,
+    box-shadow 0.18s;
+}
+.glass :where(input, textarea, select):not(:where(.monaco-editor *)):focus {
+  outline: none;
+  border-color: var(--moss);
+  box-shadow: 0 0 0 3px rgba(200, 214, 174, 0.55);
+}
+.glass textarea {
+  resize: vertical;
+}
+::placeholder {
+  color: var(--muted);
+  opacity: 1;
+}
+input[type='range'],
+input[type='checkbox'],
+input[type='radio'] {
+  accent-color: var(--moss);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}

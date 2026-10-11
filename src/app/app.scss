@@ -1,0 +1,39 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 100vh;
+}
+
+footer {
+  flex: none;
+  border-top: 1px solid var(--line);
+  padding: 12px 24px 14px;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+footer .in {
+  max-width: 1150px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+footer .right {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 12px;
+}
+
+@media (max-width: 599px) {
+  footer {
+    padding: 10px 16px 12px;
+  }
+  footer .in {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  footer .right {
+    margin-left: 0;
+  }
+}

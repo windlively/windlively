@@ -1,0 +1,732 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>windlively · 清欢小院（设计预览）</title>
+<style>
+:root{
+  --paper:#F7F3E8; --card:#FFFCF4; --moss:#456247; --willow:#C8D6AE;
+  --cyan:#BFD9D5; --peach:#D79B87; --ink:#34463B;
+  --hair:rgba(69,98,71,.30);
+  --sh3:3px 3px 0 rgba(52,70,59,.16);
+  --sh5:5px 5px 0 rgba(52,70,59,.18);
+  --serif:"Songti SC","Noto Serif SC","Source Han Serif SC",serif;
+  --sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",-apple-system,sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+}
+*{box-sizing:border-box;border-radius:0}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.75 var(--sans)}
+::selection{background:var(--willow);color:var(--ink)}
+:focus-visible{outline:2px solid var(--moss);outline-offset:2px}
+a{color:var(--ink);text-underline-offset:3px}
+img,svg{display:block}
+h1,h2,h3{text-wrap:balance;margin:0}
+.wrap{max-width:1200px;margin:0 auto;padding:0 24px;position:relative}
+
+/* 导航 */
+.nav{position:sticky;top:0;z-index:20;background:var(--paper);border-bottom:1px solid var(--hair)}
+.nav .wrap{display:flex;align-items:center;gap:28px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+.brand b{font-family:var(--mono);font-size:17px;letter-spacing:.06em}
+.nav nav{margin-left:auto;display:flex;gap:22px}
+.nav nav a{text-decoration:none;font-size:14px;padding:6px 2px;border-bottom:2px solid transparent}
+.nav nav a:hover{border-bottom-color:var(--willow)}
+
+/* 首屏 */
+.hero{padding:56px 0 8px}
+.hero .wrap{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,6fr);gap:40px;align-items:center}
+.hero h1{font-family:var(--serif);font-size:46px;font-weight:600;letter-spacing:.04em;line-height:1.25}
+.idline{display:flex;align-items:center;gap:8px;margin:0 0 12px;font-family:var(--mono);font-size:12.5px;letter-spacing:.04em;color:var(--moss)}
+.idline i{width:7px;height:7px;background:var(--willow);border:1px solid var(--moss);flex:none}
+.lede{margin:18px 0 0;color:var(--ink)}
+.lede p{margin:0}
+.hero .actions{margin-top:28px;display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.entry-sep{width:1px;height:26px;background:var(--hair)}
+.entry{display:flex;gap:8px}
+.entry a{width:38px;height:38px;display:grid;place-items:center;background:var(--card);border:1px solid var(--moss);box-shadow:var(--sh3);transition:transform .16s cubic-bezier(.2,.9,.25,1),box-shadow .16s}
+.entry a:hover{transform:translate(-2px,-2px);box-shadow:var(--sh5)}
+.btn{display:inline-block;padding:10px 20px;font-size:15px;text-decoration:none;border:1px solid var(--moss);cursor:pointer;transition:transform .16s cubic-bezier(.2,.9,.25,1),box-shadow .16s}
+.btn-primary{background:var(--moss);color:var(--card);box-shadow:var(--sh3)}
+.btn-ghost{background:var(--card);color:var(--ink);box-shadow:var(--sh3)}
+.btn:hover{transform:translate(-2px,-2px);box-shadow:var(--sh5)}
+.btn:active{transform:translate(0,1px);box-shadow:2px 2px 0 rgba(52,70,59,.2)}
+.vignette{position:relative;justify-self:center;width:100%;display:flex;flex-direction:column;align-items:center}
+.vignette canvas,.deco{display:block;image-rendering:pixelated}
+.desk-wrap{position:relative;z-index:1}
+.deco{position:absolute;pointer-events:none;z-index:0}
+/* 地面草线：元素站在真实结构线上，而不是浮在空白里 */
+.ground{position:absolute;left:24px;right:24px;bottom:-74px;height:1px;background:linear-gradient(90deg,transparent,rgba(69,98,71,.28) 7%,rgba(69,98,71,.28) 93%,transparent)}
+.ground::before{content:'';position:absolute;left:0;right:0;bottom:1px;height:3px;background:repeating-linear-gradient(90deg,rgba(69,98,71,.20) 0 2px,transparent 2px 13px),repeating-linear-gradient(90deg,rgba(69,98,71,.12) 0 1px,transparent 1px 29px);-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+.vignette::after{content:'';position:absolute;left:-72px;right:-72px;bottom:34px;height:1px;background:linear-gradient(90deg,transparent,rgba(69,98,71,.28) 12%,rgba(69,98,71,.28) 88%,transparent)}
+.soil{position:absolute;height:7px;pointer-events:none;background:radial-gradient(ellipse at center,rgba(52,70,59,.15),transparent 70%)}
+.deco-willow{right:-24px;bottom:34px;-webkit-mask-image:linear-gradient(to left,transparent 0,#000 14%),linear-gradient(to right,transparent 0,#000 10%);-webkit-mask-composite:source-in;mask-image:linear-gradient(to left,transparent 0,#000 14%),linear-gradient(to right,transparent 0,#000 10%);mask-composite:intersect}
+.soil-willow{right:-6px;bottom:30px;width:150px}
+/* 柳下挂灯：灯绳没入柳冠，灯身垂在案头右侧 */
+.hang{position:absolute;right:30px;top:96px;z-index:2;transform-origin:50% -34px;animation:sway 5.6s ease-in-out infinite}
+.hang::before{content:'';position:absolute;left:50%;top:-34px;width:1px;height:34px;background:rgba(52,70,59,.42)}
+@keyframes sway{0%,100%{transform:rotate(1.2deg)}50%{transform:rotate(-1.2deg)}}
+.deco-bamboo{left:6px;bottom:-1px}
+.deco-stool{right:40px;bottom:-74px}
+.deco-pond{right:0;bottom:-94px}
+.deco-vase{right:44px;top:-129px}
+#coffee-hot,#mac-hot{position:absolute;background:transparent;border:0;padding:0;cursor:pointer}
+#mac-hot{display:block}
+#coffee-hot:focus-visible,#mac-hot:focus-visible{outline:2px solid var(--moss);outline-offset:2px;background:rgba(200,214,174,.18)}
+.scene-mono{margin:14px 0 0;text-align:center;font-family:var(--mono);font-size:12.5px;color:var(--moss);min-height:20px}
+
+/* 板块共用 */
+section{padding:64px 0;scroll-margin-top:84px}
+#works,#cal-section{padding-bottom:104px}
+.sec-head{display:flex;align-items:baseline;gap:16px;margin-bottom:26px}
+.sec-head h2{font-size:23px;font-weight:600}
+.sec-head .meta{margin-left:auto;font-size:13.5px;color:var(--moss)}
+.sec-head .meta a{color:var(--moss)}
+
+/* 工具箱 */
+.tools-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.card{background:var(--card);border:1px solid var(--moss);box-shadow:var(--sh3);transition:transform .16s cubic-bezier(.2,.9,.25,1),box-shadow .16s}
+a.card{display:block;text-decoration:none;padding:18px}
+a.card:hover{transform:translate(-2px,-2px);box-shadow:var(--sh5)}
+.card-top{display:flex;align-items:center;gap:12px}
+.ico{width:40px;height:40px;background:#EDF1E1;border:1px solid var(--willow);display:grid;place-items:center}
+.card h3{font-size:16.5px;font-weight:600}
+.card .no{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--ink);background:var(--willow);padding:1px 6px}
+.card p{margin:12px 0 0;font-size:13.5px;color:var(--moss);line-height:1.7}
+
+/* 手记：时间轴轨道 */
+.notes-list{border-top:1px solid var(--hair);position:relative;--rail:10px}
+.notes-list::before{content:'';position:absolute;left:var(--rail);top:30px;bottom:30px;width:1px;background:var(--hair)}
+.notes-list .note{padding:16px 4px 16px 44px}
+.note::before{content:'';position:absolute;left:calc(var(--rail) - 4px);top:50%;margin-top:-5px;width:9px;height:9px;background:var(--willow);border:1px solid var(--moss)}
+@media (min-width:1100px){
+  .notes-list{--rail:92px}
+  .notes-list .note{padding-left:128px}
+}
+.note{display:flex;align-items:center;gap:18px;padding:16px 4px;border-bottom:1px solid var(--hair);text-decoration:none;position:relative}
+.note time{font-family:var(--mono);font-size:12.5px;color:var(--moss);min-width:86px}
+.note b{font-weight:500}
+.note .stamp{margin-left:auto;width:26px;height:26px;border:1px solid var(--peach);color:var(--ink);font-family:var(--mono);font-size:11px;display:grid;place-items:center;transform:rotate(-3deg);flex:none}
+.note:hover b{text-decoration:underline;text-underline-offset:4px}
+
+/* 作品 */
+.works-head{display:flex;align-items:baseline;gap:16px;margin-bottom:26px}
+.works-head h2{font-size:23px;font-weight:600}
+.tabs{margin-left:auto;display:flex;gap:8px}
+.tab{font-family:var(--mono);font-size:12.5px;padding:5px 14px;border:1px solid var(--moss);background:var(--card);color:var(--ink);cursor:pointer}
+.tab[aria-pressed="true"]{background:var(--moss);color:var(--card)}
+.works-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.repo{padding:18px}
+.repo h3{font-size:15.5px;font-family:var(--mono)}
+.repo p{margin:10px 0 14px;font-size:13.5px;color:var(--moss);min-height:44px}
+.repo .row{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--moss);font-family:var(--mono)}
+.dot{width:9px;height:9px;border:1px solid rgba(52,70,59,.35)}
+.repo .stars{margin-left:auto}
+
+/* 活跃日历 */
+.cal-box{background:transparent}
+.cal-cap{display:flex;flex-wrap:wrap;align-items:baseline;gap:14px;margin:0 0 16px}
+.cal-cap .sum{font-size:14px;color:var(--ink)}
+.cal-cap .sum b{font-family:var(--mono);font-weight:600}
+.cal-cap .cal-note{font-size:12.5px;color:var(--moss)}
+.cal-scroll{overflow-x:auto;padding-bottom:6px}
+.cal{display:flex;gap:8px;width:max-content}
+.cal-weeks{display:grid;grid-template-rows:repeat(7,10px);gap:2px;padding-top:18px;font-family:var(--mono);font-size:9.5px;color:var(--moss)}
+.cal-weeks span{height:10px;line-height:10px}
+.cal-body{display:grid;grid-template-rows:16px 1fr;gap:2px}
+.cal-months{display:grid;gap:2px;font-family:var(--mono);font-size:9.5px;color:var(--moss)}
+.cal-months span{white-space:nowrap;overflow:visible}
+.cal-grid{display:grid;grid-template-rows:repeat(7,10px);grid-auto-flow:column;gap:2px}
+.c{display:block;width:10px;height:10px;background:var(--card);border:1px solid var(--hair)}
+.c.f{border-color:transparent;background:transparent}
+.c[data-l="1"]{background:#C8D6AE;border-color:rgba(69,98,71,.35)}
+.c[data-l="2"]{background:#94A97E;border-color:rgba(52,70,59,.35)}
+.c[data-l="3"]{background:#5E7A5C;border-color:rgba(52,70,59,.4)}
+.c[data-l="4"]{background:#34463B;border-color:rgba(52,70,59,.5)}
+.cal-legend{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--moss);font-family:var(--mono);margin-top:12px}
+.cal-legend .c{margin:0}
+#cal-tip{position:fixed;z-index:60;background:var(--card);border:1px solid var(--moss);box-shadow:2px 2px 0 rgba(52,70,59,.18);font-family:var(--mono);font-size:11.5px;color:var(--ink);padding:4px 9px;pointer-events:none;display:none}
+#cal-section .cal-cap .sum{font-size:15px}
+
+/* 关于：左栏小部件 + 信笺 */
+.about-grid{display:grid;grid-template-columns:300px minmax(0,1fr);gap:24px;align-items:start}
+.rail{display:flex;flex-direction:column;gap:16px}
+.widget{background:var(--card);border:1px solid var(--moss);box-shadow:var(--sh3);padding:16px 18px}
+.w-top{display:flex;align-items:center;gap:12px}
+.w-top b{font-size:15px;font-family:var(--mono)}
+.w-top p{margin:3px 0 0;font-size:12.5px;color:var(--moss)}
+.w-title{margin:0 0 10px;font-family:var(--mono);font-size:12px;color:var(--moss);display:flex;align-items:center;gap:8px}
+.w-tag{font-size:10.5px;border:1px solid var(--willow);background:#EDF1E1;padding:0 4px;color:var(--ink)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips span{font-family:var(--mono);font-size:11.5px;border:1px solid var(--willow);background:#EDF1E1;padding:1px 7px}
+.tl{list-style:none;margin:0;padding:0 0 0 16px;position:relative}
+.tl::before{content:'';position:absolute;left:4px;top:6px;bottom:8px;width:1px;background:var(--hair)}
+.tl li{position:relative;padding:0 0 12px}
+.tl li:last-child{padding-bottom:0}
+.tl li::before{content:'';position:absolute;left:-16px;top:6px;width:7px;height:7px;background:var(--card);border:1px solid var(--moss)}
+.tl li.now::before{background:var(--willow)}
+.tl time{font-family:var(--mono);font-size:11px;color:var(--moss);display:block}
+.tl b{font-weight:600;font-size:13px}
+.tl p{margin:1px 0 0;font-size:12px;color:var(--moss)}
+/* 关于 */
+.letter{background:var(--card);border:1px solid var(--moss);box-shadow:var(--sh3);max-width:640px;padding:26px 28px;position:relative}
+.letter p{margin:0 0 14px}
+.letter .links{display:flex;gap:20px;flex-wrap:wrap;font-size:14px}
+.letter .links a{color:var(--moss)}
+
+/* 页脚：远山沉入页脚顶边，顶边即地平线 */
+.horizon{position:relative;height:200px;overflow:hidden;background:linear-gradient(to bottom,transparent,rgba(69,98,71,.06) 55%,rgba(69,98,71,.10))}
+.horizon canvas{position:absolute;left:50%;bottom:0;transform:translateX(-50%);-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 30%),linear-gradient(to right,transparent 0,#000 15%,#000 85%,transparent);-webkit-mask-composite:source-in;mask-image:linear-gradient(to bottom,transparent 0,#000 30%),linear-gradient(to right,transparent 0,#000 15%,#000 85%,transparent);mask-composite:intersect}
+footer{margin-top:24px;border-top:1px solid var(--hair);padding:22px 0 96px;font-size:13px;color:var(--moss)}
+footer .wrap{display:flex;gap:18px;flex-wrap:wrap}
+footer .right{margin-left:auto;font-family:var(--mono);font-size:12px}
+
+/* 预览控制条（不属于设计本身） */
+.pv-bar{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:50;display:flex;align-items:center;gap:12px;background:var(--ink);color:var(--card);padding:8px 14px;box-shadow:4px 4px 0 rgba(52,70,59,.25);font-size:12.5px}
+.pv-bar .lab{font-family:var(--mono);font-size:11.5px;opacity:.85}
+.pv-bar button{font-family:var(--mono);font-size:11.5px;padding:4px 10px;border:1px solid var(--card);background:transparent;color:var(--card);cursor:pointer;white-space:nowrap}
+.pv-bar button[aria-pressed="true"]{background:var(--willow);border-color:var(--willow);color:var(--ink)}
+.pv-bar .hint{opacity:.75}
+
+body[data-place="a"] #cal-slot-b{display:none}
+body[data-place="b"] #cal-section{display:none}
+
+@media (max-width:1099px){.deco-bamboo{display:none}}
+@media (max-width:899px){
+  .hero .wrap{grid-template-columns:1fr;gap:26px}
+  .hero-text{display:contents}
+  .hero h1{order:1}
+  .hero .lede{order:2}
+  .hero .vignette{order:3}
+  .hero .actions{order:4}
+  .hero h1{font-size:36px}
+  .tools-grid,.works-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .about-grid{grid-template-columns:1fr}
+  .deco-vase,.deco-bamboo,.hang{display:none}
+  .deco-pond{position:static;margin:20px auto 0}
+  .deco-willow{right:-8px}
+  .vignette::after{left:-16px;right:-16px}
+  #cal-section{padding-bottom:30px}
+  #cal-section .ground{bottom:0}
+  .horizon{height:176px}
+}
+@media (max-width:599px){
+  .tools-grid,.works-grid{grid-template-columns:1fr}
+  .nav .wrap{gap:20px}
+  .brand b{font-size:15px;letter-spacing:0}
+  .nav nav{gap:10px}
+  .nav nav a{font-size:12.5px;padding:6px 0}
+  .hero{padding:34px 0 4px}
+  .hero h1{font-size:31px}
+  .hero .actions .btn{flex:1;text-align:center}
+  .entry-sep{display:none}
+  .wrap{padding:0 16px}
+  .note .stamp{display:none}
+  .pv-bar{left:8px;right:8px;transform:none;width:auto;justify-content:center;gap:10px}
+  .pv-bar .hint{display:none}
+  .deco-stool{right:16px}
+  .horizon{height:150px}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{transition:none!important;animation:none!important}
+}
+</style>
+</head>
+<body data-place="a">
+<div class="nav">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="windlively 首页">
+      <svg width="18" height="18" viewBox="0 0 16 16" shape-rendering="crispEdges" aria-hidden="true">
+        <rect x="3" y="6" width="9" height="7" fill="#FFFCF4"/><rect x="3" y="6" width="9" height="1" fill="#456247"/><rect x="3" y="12" width="9" height="1" fill="#456247"/><rect x="2" y="9" width="1" height="3" fill="#456247"/><rect x="12" y="8" width="2" height="3" fill="#456247"/><rect x="13" y="7" width="1" height="1" fill="#456247"/><rect x="2" y="14" width="12" height="1" fill="#456247"/><rect x="5" y="3" width="1" height="2" fill="#C8D6AE"/><rect x="8" y="2" width="1" height="2" fill="#C8D6AE"/>
+      </svg>
+      <b>windlively</b>
+    </a>
+    <nav>
+      <a href="#top">小院</a><a href="#tools">工具箱</a><a href="#notes">手记</a><a href="#works">作品</a><a href="#about">关于</a>
+    </nav>
+  </div>
+</div>
+
+<main id="top">
+  <section class="hero">
+    <div class="wrap">
+      <div class="hero-text">
+        <p class="idline"><i aria-hidden="true"></i>windlively · 前端 / 全栈 · 写一点小工具</p>
+        <h1>人间有味是清欢</h1>
+        <div class="lede">
+          <p>写一点代码，记一些想法。</p>
+          <p>把好用的小东西，收进这方小院。</p>
+        </div>
+        <div class="actions">
+          <a class="btn btn-primary" href="#tools">打开工具箱</a>
+          <a class="btn btn-ghost" href="#notes">翻翻手记</a>
+          <span class="entry-sep" aria-hidden="true"></span>
+          <div class="entry">
+            <a href="#notes" title="博客" aria-label="博客"><svg width="20" height="20" viewBox="0 0 20 20" shape-rendering="crispEdges" aria-hidden="true"><rect x="4" y="3" width="12" height="14" fill="#FFFCF4"/><rect x="4" y="3" width="12" height="1" fill="#456247"/><rect x="4" y="16" width="12" height="1" fill="#456247"/><rect x="4" y="3" width="1" height="14" fill="#456247"/><rect x="15" y="3" width="1" height="14" fill="#456247"/><rect x="7" y="7" width="6" height="1" fill="#456247"/><rect x="7" y="10" width="6" height="1" fill="#C8D6AE"/><rect x="7" y="13" width="4" height="1" fill="#456247"/></svg></a>
+            <a href="#works" title="GitHub" aria-label="GitHub"><svg width="20" height="20" viewBox="0 0 20 20" shape-rendering="crispEdges" aria-hidden="true"><rect x="5" y="3" width="3" height="3" fill="#456247"/><rect x="5" y="14" width="3" height="3" fill="#456247"/><rect x="12" y="9" width="3" height="3" fill="#C8D6AE"/><rect x="6" y="6" width="1" height="8" fill="#456247"/><rect x="7" y="10" width="6" height="1" fill="#456247"/></svg></a>
+            <a href="#works" title="Gitee" aria-label="Gitee"><svg width="20" height="20" viewBox="0 0 20 20" shape-rendering="crispEdges" aria-hidden="true"><rect x="7" y="3" width="6" height="2" fill="#D79B87"/><rect x="5" y="5" width="2" height="2" fill="#D79B87"/><rect x="13" y="5" width="2" height="2" fill="#D79B87"/><rect x="5" y="7" width="2" height="2" fill="#D79B87"/><rect x="5" y="9" width="2" height="2" fill="#D79B87"/><rect x="11" y="9" width="4" height="2" fill="#D79B87"/><rect x="5" y="11" width="2" height="2" fill="#D79B87"/><rect x="13" y="11" width="2" height="2" fill="#D79B87"/><rect x="5" y="13" width="2" height="2" fill="#D79B87"/><rect x="13" y="13" width="2" height="2" fill="#D79B87"/><rect x="7" y="15" width="6" height="2" fill="#D79B87"/></svg></a>
+            <a href="#about" title="邮箱" aria-label="邮箱"><svg width="20" height="20" viewBox="0 0 20 20" shape-rendering="crispEdges" aria-hidden="true"><rect x="3" y="5" width="14" height="10" fill="#FFFCF4"/><rect x="3" y="5" width="14" height="1" fill="#456247"/><rect x="3" y="14" width="14" height="1" fill="#456247"/><rect x="3" y="5" width="1" height="10" fill="#456247"/><rect x="16" y="5" width="1" height="10" fill="#456247"/><rect x="4" y="7" width="2" height="1" fill="#456247"/><rect x="6" y="8" width="2" height="1" fill="#456247"/><rect x="8" y="9" width="4" height="1" fill="#456247"/><rect x="12" y="8" width="2" height="1" fill="#456247"/><rect x="14" y="7" width="2" height="1" fill="#456247"/></svg></a>
+          </div>
+        </div>
+      </div>
+      <div class="vignette">
+        <canvas id="sp-willow" class="deco deco-willow" aria-hidden="true"></canvas>
+        <span class="soil soil-willow" aria-hidden="true"></span>
+        <div class="desk-wrap">
+          <canvas id="sp-desk" aria-hidden="true"></canvas>
+          <button id="coffee-hot" aria-label="喝口咖啡"></button>
+          <a id="mac-hot" href="#tools" aria-label="打开编辑器（预览不跳转）"></a>
+        </div>
+        <div class="hang" aria-hidden="true"><canvas id="sp-lantern"></canvas></div>
+        <p class="scene-mono" id="scene-mono" aria-live="polite">coffee + MacBook = 生生不息的代码</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="tools">
+    <div class="wrap">
+      <div class="sec-head"><h2>工具箱</h2><span class="meta">六件小工具</span></div>
+      <div class="tools-grid">
+        <a class="card" href="#tools" data-tool="ocr">
+          <div class="card-top">
+            <span class="ico"><svg width="24" height="24" viewBox="0 0 24 24" shape-rendering="crispEdges" aria-hidden="true"><rect x="4" y="9" width="16" height="10" fill="#456247"/><rect x="8" y="6" width="8" height="3" fill="#456247"/><rect x="9" y="11" width="6" height="6" fill="#F7F3E8"/><rect x="11" y="13" width="2" height="2" fill="#34463B"/><rect x="14" y="10" width="2" height="1" fill="#BFD9D5"/><rect x="5" y="18" width="3" height="1" fill="#C8D6AE"/></svg></span>
+            <h3>图片识别</h3><span class="no">01</span>
+          </div>
+          <p>印刷体与手写体 OCR，识别由服务器后端完成。</p>
+        </a>
+        <a class="card" href="#tools" data-tool="image">
+          <div class="card-top">
+            <span class="ico"><svg width="24" height="24" viewBox="0 0 24 24" shape-rendering="crispEdges" aria-hidden="true"><rect x="7" y="4" width="13" height="11" fill="#BFD9D5"/><rect x="4" y="8" width="15" height="12" fill="#456247"/><rect x="5" y="9" width="13" height="10" fill="#FFFCF4"/><rect x="6" y="15" width="5" height="3" fill="#C8D6AE"/><rect x="10" y="13" width="3" height="5" fill="#C8D6AE"/><rect x="14" y="11" width="2" height="2" fill="#D79B87"/></svg></span>
+            <h3>图片工具</h3><span class="no">02</span>
+          </div>
+          <p>图片编码与格式转换，Base64 与尺寸信息。</p>
+        </a>
+        <a class="card" href="#tools" data-tool="json">
+          <div class="card-top">
+            <span class="ico"><svg width="24" height="24" viewBox="0 0 24 24" shape-rendering="crispEdges" aria-hidden="true"><rect x="6" y="3" width="12" height="18" fill="#456247"/><rect x="7" y="4" width="10" height="16" fill="#FFFCF4"/><rect x="9" y="9" width="1" height="1" fill="#34463B"/><rect x="8" y="10" width="1" height="4" fill="#34463B"/><rect x="9" y="14" width="1" height="1" fill="#34463B"/><rect x="14" y="9" width="1" height="1" fill="#34463B"/><rect x="15" y="10" width="1" height="4" fill="#34463B"/><rect x="14" y="14" width="1" height="1" fill="#34463B"/></svg></span>
+            <h3>JSON 预览</h3><span class="no">03</span>
+          </div>
+          <p>格式化与树形查看，长路径局部滚动。</p>
+        </a>
+        <a class="card" href="#tools" data-tool="unit">
+          <div class="card-top">
+            <span class="ico"><svg width="24" height="24" viewBox="0 0 24 24" shape-rendering="crispEdges" aria-hidden="true"><rect x="3" y="9" width="18" height="7" fill="#B68158"/><rect x="6" y="10" width="1" height="3" fill="#FFFCF4"/><rect x="9" y="10" width="1" height="4" fill="#FFFCF4"/><rect x="12" y="10" width="1" height="3" fill="#FFFCF4"/><rect x="15" y="10" width="1" height="4" fill="#FFFCF4"/><rect x="18" y="10" width="1" height="3" fill="#FFFCF4"/></svg></span>
+            <h3>单位转换</h3><span class="no">04</span>
+          </div>
+          <p>常用单位换算，小数与负数都能输入。</p>
+        </a>
+        <a class="card" href="#tools" data-tool="monaco">
+          <div class="card-top">
+            <span class="ico"><svg width="24" height="24" viewBox="0 0 24 24" shape-rendering="crispEdges" aria-hidden="true"><rect x="5" y="5" width="14" height="10" fill="#34463B"/><rect x="6" y="6" width="12" height="8" fill="#FFFCF4"/><rect x="8" y="8" width="5" height="1" fill="#456247"/><rect x="8" y="10" width="7" height="1" fill="#D79B87"/><rect x="8" y="12" width="3" height="1" fill="#BFD9D5"/><rect x="3" y="15" width="18" height="3" fill="#456247"/></svg></span>
+            <h3>Monaco 编辑器</h3><span class="no">05</span>
+          </div>
+          <p>浏览器里的代码编辑器，支持导出到本地。</p>
+        </a>
+        <a class="card" href="#tools" data-tool="lab">
+          <div class="card-top">
+            <span class="ico"><svg width="24" height="24" viewBox="0 0 24 24" shape-rendering="crispEdges" aria-hidden="true"><rect x="11" y="3" width="2" height="4" fill="#C8D6AE"/><rect x="8" y="4" width="2" height="2" fill="#C8D6AE"/><rect x="14" y="4" width="2" height="2" fill="#C8D6AE"/><rect x="10" y="7" width="4" height="3" fill="#BFD9D5"/><rect x="8" y="10" width="8" height="3" fill="#BFD9D5"/><rect x="7" y="13" width="10" height="3" fill="#BFD9D5"/><rect x="6" y="16" width="12" height="4" fill="#BFD9D5"/><rect x="8" y="17" width="8" height="2" fill="#456247"/></svg></span>
+            <h3>Angular 实验室</h3><span class="no">06</span>
+          </div>
+          <p>Angular 特性演示：信号、effect 与路由。</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section id="notes">
+    <div class="wrap">
+      <div class="sec-head"><h2>手记</h2><span class="meta"><a href="#notes">去博客看看 →</a></span></div>
+      <div id="cal-slot-b" class="cal-box" aria-label="活跃日历（落位 B：并入手记）"></div>
+      <div class="notes-list">
+        <canvas id="sp-bamboo" class="deco deco-bamboo" aria-hidden="true"></canvas>
+        <a class="note" href="#notes"><time>2026-09-28</time><b>在 Angular 里给页面过渡留一条后路</b><span class="stamp">01</span></a>
+        <a class="note" href="#notes"><time>2026-09-12</time><b>把一张图变成一段代码：像素小院的矢量化</b><span class="stamp">02</span></a>
+        <a class="note" href="#notes"><time>2026-08-30</time><b>六个小工具，一间工具箱</b><span class="stamp">03</span></a>
+        <a class="note" href="#notes"><time>2026-08-16</time><b>手写体 OCR 的三个坑</b><span class="stamp">04</span></a>
+      </div>
+    </div>
+  </section>
+
+  <section id="works">
+    <div class="wrap">
+      <div class="works-head">
+        <h2>作品</h2>
+        <div class="tabs" role="group" aria-label="仓库来源">
+          <button class="tab" aria-pressed="true">GitHub</button>
+          <button class="tab" aria-pressed="false">Gitee</button>
+        </div>
+      </div>
+      <div class="works-grid">
+        <a class="card repo" href="#works">
+          <h3>windlively</h3>
+          <p>个人主页与小工具集合：像素小院、六个工具、手记与作品。</p>
+          <div class="row"><span class="dot" style="background:#BFD9D5"></span>TypeScript<span class="stars">★ 12</span></div>
+        </a>
+        <a class="card repo" href="#works">
+          <h3>sundry-booklet</h3>
+          <p>随手记的小册子，把零散的想法收成一本。</p>
+          <div class="row"><span class="dot" style="background:#C8D6AE"></span>TypeScript<span class="stars">★ 7</span></div>
+        </a>
+        <a class="card repo" href="#works">
+          <h3>resume</h3>
+          <p>一份用网页排版的简历，可导出 PDF。</p>
+          <div class="row"><span class="dot" style="background:#D79B87"></span>CSS<span class="stars">★ 3</span></div>
+        </a>
+      </div>
+      <div class="ground" aria-hidden="true"></div>
+      <canvas id="sp-stool" class="deco deco-stool" aria-hidden="true"></canvas>
+    </div>
+  </section>
+
+  <section id="cal-section">
+    <div class="wrap">
+      <div class="sec-head"><h2>足迹</h2><span class="meta">过去一年 · 数据截至 2026-10-10 · 示例数据</span></div>
+      <div id="cal-host-a" class="cal-box" aria-label="活跃日历（落位 A：独立小节）"></div>
+      <div class="ground" aria-hidden="true"></div>
+      <canvas id="sp-pond" class="deco deco-pond" aria-hidden="true"></canvas>
+    </div>
+  </section>
+
+  <section id="about">
+    <div class="wrap">
+      <div class="sec-head"><h2>关于这方小院</h2><span class="meta">博客 · GitHub · Gitee · 邮件</span></div>
+      <div class="about-grid">
+        <div class="rail">
+          <div class="widget">
+            <div class="w-top">
+              <span class="ico"><svg width="24" height="24" viewBox="0 0 16 16" shape-rendering="crispEdges" aria-hidden="true">
+                <rect x="3" y="6" width="9" height="7" fill="#FFFCF4"/><rect x="3" y="6" width="9" height="1" fill="#456247"/><rect x="3" y="12" width="9" height="1" fill="#456247"/><rect x="2" y="9" width="1" height="3" fill="#456247"/><rect x="12" y="8" width="2" height="3" fill="#456247"/><rect x="13" y="7" width="1" height="1" fill="#456247"/><rect x="2" y="14" width="12" height="1" fill="#456247"/><rect x="5" y="3" width="1" height="2" fill="#C8D6AE"/><rect x="8" y="2" width="1" height="2" fill="#C8D6AE"/>
+              </svg></span>
+              <div><b>windlively</b><p>程序员 · 前端 / 全栈</p></div>
+            </div>
+          </div>
+          <div class="widget">
+            <p class="w-title">手边常用</p>
+            <div class="chips"><span>Angular</span><span>TypeScript</span><span>Node</span><span>CSS</span><span>像素画</span><span>小工具</span></div>
+          </div>
+          <div class="widget">
+            <p class="w-title">小院年表 <span class="w-tag">示意</span></p>
+            <ol class="tl">
+              <li class="now"><time>2026.10</time><b>像素小院改版</b><p>元素融入 · 活跃日历</p></li>
+              <li><time>2026.09</time><b>改名 windlively</b><p>重写为 Angular</p></li>
+              <li><time>2026.06</time><b>六件工具入住</b><p>OCR · 图片 · JSON …</p></li>
+              <li><time>2020.11</time><b>备案与域名</b><p>小院开张</p></li>
+            </ol>
+          </div>
+        </div>
+        <div class="letter">
+          <canvas id="sp-vase" class="deco deco-vase" aria-hidden="true"></canvas>
+          <p>这里放着我写的代码、做的小工具，以及一些值得留下的想法。</p>
+          <div class="links">
+            <a href="#about">博客</a><a href="#about">GitHub</a><a href="#about">Gitee</a><a href="#about">limingjun@example.com</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="horizon" aria-hidden="true"><canvas id="sp-mountains"></canvas></div>
+
+<footer>
+  <div class="wrap">
+    <span>windlively · 人间有味是清欢</span>
+    <span class="right">京ICP备20022083号-3</span>
+  </div>
+</footer>
+
+<div class="pv-bar" role="group" aria-label="预览控制">
+  <span class="lab">预览控制 · 日历落位</span>
+  <button id="pv-a" aria-pressed="true">A 独立小节</button>
+  <button id="pv-b" aria-pressed="false">B 并入手记</button>
+  <span class="hint">点一下咖啡杯试试 · 元素为矢量绘制 · 手记/作品/日历/年表为占位示例</span>
+</div>
+<div id="cal-tip" role="tooltip" aria-hidden="true"></div>
+
+<script src="build/yard-sprites.js"></script>
+<script>
+/* ================= 矢量元素铺陈：精灵数据 → 各 canvas ================= */
+const SP = window.YARD_SPRITES;
+const PAL = SP.palette;
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
+const sceneMono = document.getElementById('scene-mono');
+const coffeeHot = document.getElementById('coffee-hot');
+const macHot = document.getElementById('mac-hot');
+const MONO_DEFAULT = 'coffee + MacBook = 生生不息的代码';
+const MONO_BREW = '坐一会儿，喝口咖啡';
+const GLYPHS = [ // `</>` 手摆 3×3 点阵
+  [[1, 0], [0, 1], [1, 2]],
+  [[0, 2], [1, 1], [2, 0]],
+  [[1, 0], [2, 1], [1, 2]],
+];
+
+// 行程数据（'z'=35 为透明）→ 按色分组矩形；阴影蒙版（'a'）单独解码
+function decode(sprite) {
+  const byColor = PAL.map(() => []);
+  for (let y = 0; y < sprite.h; y++) {
+    const s = sprite.runs[y];
+    let x = 0;
+    for (let i = 0; i < s.length; i += 3) {
+      const n = parseInt(s.slice(i, i + 2), 36) + 1;
+      const ci = parseInt(s[i + 2], 36);
+      if (ci !== 35) byColor[ci].push(x, y, n);
+      x += n;
+    }
+  }
+  return byColor;
+}
+function decodeMask(rows) {
+  const out = [];
+  for (let y = 0; y < rows.length; y++) {
+    const s = rows[y];
+    let x = 0;
+    for (let i = 0; i < s.length; i += 3) {
+      const n = parseInt(s.slice(i, i + 2), 36) + 1;
+      if (s[i + 2] === 'a') out.push(x, y, n);
+      x += n;
+    }
+  }
+  return out;
+}
+
+function mount(id, name, scale) {
+  const el = document.getElementById(id);
+  const sp = SP.sprites[name];
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  el.style.width = sp.w * scale + 'px';
+  el.style.height = sp.h * scale + 'px';
+  el.width = Math.round(sp.w * scale * dpr);
+  el.height = Math.round(sp.h * scale * dpr);
+  const ctx = el.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.imageSmoothingEnabled = false;
+  const base = document.createElement('canvas');
+  base.width = el.width;
+  base.height = el.height;
+  const b = base.getContext('2d');
+  b.setTransform(dpr, 0, 0, dpr, 0, 0);
+  if (sp.shadow) {
+    b.fillStyle = 'rgba(52,70,59,.16)';
+    const m = decodeMask(sp.shadow);
+    for (let i = 0; i < m.length; i += 3) b.fillRect(m[i] * scale, m[i + 1] * scale, m[i + 2] * scale, scale);
+  }
+  const byColor = decode(sp);
+  for (let ci = 0; ci < PAL.length; ci++) {
+    b.fillStyle = PAL[ci];
+    const a = byColor[ci];
+    for (let i = 0; i < a.length; i += 3) b.fillRect(a[i] * scale, a[i + 1] * scale, a[i + 2] * scale, scale);
+  }
+  return { ctx, base, scale, w: sp.w, h: sp.h };
+}
+
+const CUP = [21, 36, 32, 30]; // 咖啡杯热区（精灵局部格坐标）
+const MAC = [66, 6, 78, 48];  // 笔记本热区
+const M = {};
+const plain = (m) => { m.ctx.clearRect(0, 0, m.w * m.scale, m.h * m.scale); m.ctx.drawImage(m.base, 0, 0, m.w * m.scale, m.h * m.scale); };
+
+function renderAll() {
+  const vw = window.innerWidth;
+  M.willow = mount('sp-willow', 'willow', vw < 640 ? 1 : 2);
+  M.desk = mount('sp-desk', 'desk', vw < 480 ? 1 : 2);
+  M.lantern = mount('sp-lantern', 'lantern', 1);
+  M.bamboo = mount('sp-bamboo', 'bamboo', 1);
+  M.stool = mount('sp-stool', 'stool', 1);
+  M.pond = mount('sp-pond', 'pond', 2);
+  M.vase = mount('sp-vase', 'vase', 1);
+  M.mountains = mount('sp-mountains', 'mountains', vw < 760 ? 2 : 3);
+  [M.lantern, M.bamboo, M.stool, M.vase, M.mountains].forEach(plain);
+  const s = M.desk.scale;
+  const put = (el, r) => {
+    el.style.left = r[0] * s + 'px';
+    el.style.top = r[1] * s + 'px';
+    el.style.width = r[2] * s + 'px';
+    el.style.height = r[3] * s + 'px';
+  };
+  put(coffeeHot, CUP);
+  put(macHot, MAC);
+}
+
+let brewingUntil = 0, raf = 0;
+function frame(now) {
+  const t = now / 1000;
+  // 案头：热气、屏幕光标、喝咖啡彩蛋
+  const d = M.desk, c = d.ctx, s = d.scale;
+  const px = (x, y, w, h) => c.fillRect(x * s, y * s, w * s, h * s);
+  plain(d);
+  for (let k = 0; k < 2; k++) {
+    const p = ((t / 1.4) + k * .5) % 1;
+    c.globalAlpha = (1 - p) * .85;
+    c.fillStyle = '#f5efe0';
+    px(33 + k * 7 + Math.sin(t / .7 + k * 3) * 1.5, 32 - p * 20, 1, 1);
+    px(34 + k * 7, 34 - p * 20, 1, 1);
+  }
+  c.globalAlpha = 1;
+  if (Math.floor(t * 1.9) % 2 === 0) { c.fillStyle = '#fff6dc'; px(78, 42, 1, 2); }
+  if (now < brewingUntil) {
+    c.fillStyle = '#8ae05a';
+    for (let g = 0; g < 3; g++) for (const [dx, dy] of GLYPHS[g]) px(94 + g * 7 + dx * 2, 18 + dy * 2, 1, 1);
+    c.fillStyle = '#fff2c8'; px(72, 46, 66, 1);
+    c.fillStyle = '#8ae05a'; px(74, 48, 5, 1); px(82, 48, 7, 1);
+  }
+  // 柳絮：自柳梢缓缓飘落
+  const wl = M.willow, wc = wl.ctx, ws = wl.scale;
+  plain(wl);
+  wc.fillStyle = '#f2ecd7';
+  for (let k = 0; k < 2; k++) {
+    const p = ((t / 6) + k * .5) % 1;
+    wc.globalAlpha = .8 * (1 - p * .6);
+    wc.fillRect(Math.round((118 - p * 54 + Math.sin(t / 1.3 + k * 2) * 4) * ws), Math.round((30 + p * 96) * ws), ws, ws);
+  }
+  wc.globalAlpha = 1;
+  // 池塘：两圈涟漪
+  const pd = M.pond, pc = pd.ctx, ps = pd.scale;
+  plain(pd);
+  pc.fillStyle = '#dfe9e6';
+  const centers = [[50, 40], [70, 32]];
+  for (let k = 0; k < 2; k++) {
+    const p = ((t / 2.8) + k / 2) % 1;
+    const r = 2 + p * 7;
+    pc.globalAlpha = .8 * (1 - p);
+    for (let a = 0; a < 8; a++) {
+      const ang = a / 8 * Math.PI * 2;
+      pc.fillRect(Math.round((centers[k][0] + Math.cos(ang) * r) * ps), Math.round((centers[k][1] + Math.sin(ang) * r * .55) * ps), ps, ps);
+    }
+  }
+  pc.globalAlpha = 1;
+  if (!reduceMotion.matches && !document.hidden) raf = requestAnimationFrame(frame);
+}
+function start() {
+  cancelAnimationFrame(raf);
+  if (reduceMotion.matches || document.hidden) { plain(M.desk); plain(M.willow); plain(M.pond); }
+  else raf = requestAnimationFrame(frame);
+}
+function sync() { renderAll(); start(); }
+
+coffeeHot.addEventListener('click', () => {
+  brewingUntil = performance.now() + 2600;
+  sceneMono.textContent = MONO_BREW;
+  clearTimeout(coffeeHot._t);
+  coffeeHot._t = setTimeout(() => { sceneMono.textContent = MONO_DEFAULT; }, 2600);
+});
+macHot.addEventListener('click', (e) => { e.preventDefault(); document.getElementById('tools').scrollIntoView({ behavior: reduceMotion.matches ? 'auto' : 'smooth' }); });
+document.querySelectorAll('.card[data-tool]').forEach(a => a.addEventListener('click', e => e.preventDefault()));
+sceneMono.textContent = MONO_DEFAULT;
+
+matchMedia('(prefers-reduced-motion: reduce)').addEventListener?.('change', sync);
+window.addEventListener('resize', sync);
+document.addEventListener('visibilitychange', () => { if (document.hidden) cancelAnimationFrame(raf); else start(); });
+sync();
+
+/* ================= 活跃日历（示例数据） ================= */
+function genDays() {
+  const start = new Date(2025, 9, 13);
+  const today = new Date(2026, 9, 10);
+  let seed = 20261011;
+  const rnd = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; };
+  const days = [];
+  for (let i = 0; i < 371; i++) {
+    const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+    const dow = (d.getDay() + 6) % 7;
+    let c = 0;
+    const vac1 = d >= new Date(2026, 0, 28) && d <= new Date(2026, 1, 8);
+    const vac2 = d >= new Date(2026, 7, 8) && d <= new Date(2026, 7, 19);
+    if (!vac1 && !vac2) {
+      c = rnd() < (dow < 5 ? .62 : .38) ? 1 + Math.floor(rnd() * (dow < 5 ? 5 : 3)) : 0;
+      if (rnd() < .05) c += 6 + Math.floor(rnd() * 7);
+    }
+    if (d >= new Date(2026, 2, 16) && d <= new Date(2026, 3, 12)) c = Math.max(c, 1 + Math.floor(rnd() * 3));
+    days.push({ d, c, f: d > today });
+  }
+  return days;
+}
+const DAYS = genDays();
+const past = DAYS.filter(x => !x.f);
+const total = past.reduce((s, x) => s + x.c, 0);
+let streak = 0, best = 0;
+for (const x of past) { streak = x.c > 0 ? streak + 1 : 0; if (streak > best) best = streak; }
+const MONTHS = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+const level = c => c === 0 ? 0 : c <= 2 ? 1 : c <= 5 ? 2 : c <= 9 ? 3 : 4;
+const tip = document.getElementById('cal-tip');
+
+function buildCalendar(host, weeks, opts) {
+  const slice = DAYS.slice(DAYS.length - weeks * 7);
+  const box = document.createElement('div');
+  const cap = document.createElement('div'); cap.className = 'cal-cap';
+  const sum = document.createElement('span'); sum.className = 'sum';
+  sum.innerHTML = `过去一年 <b>${total}</b> 次提交 · 最长连续 <b>${best}</b> 天`;
+  const note = document.createElement('span'); note.className = 'cal-note';
+  note.textContent = opts && opts.note ? opts.note : '';
+  cap.append(sum, note);
+
+  const scroll = document.createElement('div'); scroll.className = 'cal-scroll';
+  const cal = document.createElement('div'); cal.className = 'cal';
+  const wkd = document.createElement('div'); wkd.className = 'cal-weeks';
+  ['一','','三','','五','',''].forEach(t => { const s = document.createElement('span'); s.textContent = t; wkd.appendChild(s); });
+  const body = document.createElement('div'); body.className = 'cal-body';
+  const months = document.createElement('div'); months.className = 'cal-months';
+  months.style.gridTemplateColumns = `repeat(${weeks},10px)`;
+  const grid = document.createElement('div'); grid.className = 'cal-grid'; grid.setAttribute('role', 'img');
+  grid.setAttribute('aria-label', `过去一年 ${total} 次提交，最长连续 ${best} 天（示例数据）`);
+  let lastMonth = -1, lastLabelW = -9;
+  for (let w = 0; w < weeks; w++) {
+    const monday = slice[w * 7].d.getMonth();
+    const label = document.createElement('span');
+    if (monday !== lastMonth) {
+      lastMonth = monday;
+      if (w - lastLabelW >= 2) { label.textContent = MONTHS[monday]; lastLabelW = w; }
+    }
+    months.appendChild(label);
+    for (let r = 0; r < 7; r++) {
+      const day = slice[w * 7 + r];
+      const c = document.createElement('i'); c.className = 'c' + (day.f ? ' f' : '');
+      c.setAttribute('aria-hidden', 'true');
+      if (!day.f) {
+        c.dataset.l = level(day.c);
+        c.dataset.tip = `${day.d.toLocaleDateString('sv')} · ${day.c === 0 ? '无提交' : day.c + ' 次提交'}`;
+      }
+      grid.appendChild(c);
+    }
+  }
+  grid.addEventListener('mouseover', e => {
+    const c = e.target.closest('.c[data-tip]');
+    if (!c) { tip.style.display = 'none'; return; }
+    tip.textContent = c.dataset.tip; tip.style.display = 'block';
+    const r = c.getBoundingClientRect();
+    tip.style.left = Math.min(window.innerWidth - tip.offsetWidth - 8, Math.max(8, r.left + r.width / 2 - tip.offsetWidth / 2)) + 'px';
+    tip.style.top = Math.max(8, r.top - tip.offsetHeight - 6) + 'px';
+  });
+  grid.addEventListener('mouseleave', () => { tip.style.display = 'none'; });
+
+  body.append(months, grid);
+  cal.append(wkd, body);
+  scroll.appendChild(cal);
+  const legend = document.createElement('div'); legend.className = 'cal-legend';
+  legend.innerHTML = '<span>少</span><i class="c"></i><i class="c" data-l="1"></i><i class="c" data-l="2"></i><i class="c" data-l="3"></i><i class="c" data-l="4"></i><span>多</span>';
+  box.append(cap, scroll, legend);
+  host.appendChild(box);
+  if (opts && opts.scrollRight) requestAnimationFrame(() => { scroll.scrollLeft = scroll.scrollWidth; });
+}
+buildCalendar(document.getElementById('cal-host-a'), 53, {});
+buildCalendar(document.getElementById('cal-slot-b'), 16, { scrollRight: true, note: '最近 16 周 · 示例数据 · 悬停看单日' });
+
+/* ================= 预览控制：日历落位 A/B ================= */
+const pvA = document.getElementById('pv-a'), pvB = document.getElementById('pv-b');
+function setPlace(p) {
+  document.body.dataset.place = p;
+  pvA.setAttribute('aria-pressed', String(p === 'a'));
+  pvB.setAttribute('aria-pressed', String(p === 'b'));
+  tip.style.display = 'none';
+}
+pvA.addEventListener('click', () => setPlace('a'));
+pvB.addEventListener('click', () => setPlace('b'));
+if (location.hash === '#place-b') setPlace('b');
+
+/* 作品页签（预览示意） */
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
+  document.querySelectorAll('.tab').forEach(x => x.setAttribute('aria-pressed', String(x === t)));
+}));
+</script>
+</body>
+</html>

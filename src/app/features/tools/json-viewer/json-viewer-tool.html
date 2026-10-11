@@ -1,0 +1,59 @@
+<app-tool-head toolId="json-viewer" />
+
+<div class="layout">
+  <section class="pane glass">
+    <header class="pane-head">
+      <span class="pane-title"><app-icon name="braces" [size]="16" /> 输入</span>
+      <span class="spacer"></span>
+      @if (error()) {
+        <span class="badge error" [title]="error()">解析出错</span>
+      } @else if (parsed() !== null) {
+        <span class="badge ok">解析成功</span>
+      }
+    </header>
+    <textarea
+      class="editor mono"
+      [value]="raw()"
+      (input)="onInput($any($event.target).value)"
+      placeholder="粘贴 JSON 字符串……"
+      spellcheck="false"
+      aria-label="JSON 输入"
+    ></textarea>
+    <footer class="pane-foot">
+      <span class="subtle">{{ sizeLabel() }}</span>
+      <span class="spacer"></span>
+      <button type="button" class="btn btn-sm" (click)="format()" [disabled]="!!error()">格式化</button>
+      <button type="button" class="btn btn-sm" (click)="minify()" [disabled]="!!error()">压缩</button>
+      <button type="button" class="btn btn-sm" (click)="loadSample()">示例</button>
+      <button type="button" class="btn btn-sm" (click)="clear()">清空</button>
+    </footer>
+    @if (error()) {
+      <p class="err mono" role="alert">{{ error() }}</p>
+    }
+  </section>
+
+  <section class="pane glass">
+    <header class="pane-head">
+      <span class="pane-title"><app-icon name="search" [size]="16" /> 树形预览</span>
+      <span class="spacer"></span>
+      @if (parsed() !== null) {
+        <app-copy-button [text]="raw()" label="复制" />
+      }
+      <button type="button" class="btn btn-sm" (click)="expandAll()" [disabled]="parsed() === null">
+        展开全部
+      </button>
+      <button type="button" class="btn btn-sm" (click)="collapseAll()" [disabled]="parsed() === null">
+        收起
+      </button>
+    </header>
+    <div class="tree-wrap">
+      @if (parsed() !== null) {
+        <app-json-tree [data]="parsed()" />
+      } @else {
+        <p class="placeholder subtle">
+          {{ error() ? '修正输入后将自动重新解析' : '左侧输入 JSON 后在此处预览' }}
+        </p>
+      }
+    </div>
+  </section>
+</div>

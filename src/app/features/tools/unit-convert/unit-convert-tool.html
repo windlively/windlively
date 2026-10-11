@@ -1,0 +1,45 @@
+<app-tool-head toolId="unit-convert" />
+
+<div class="glass body">
+  <app-tabs [tabs]="catTabs" [value]="activeCatId()" (valueChange)="selectCategory($event)" />
+
+  <div class="input-row">
+    <input
+      type="text"
+      inputmode="decimal"
+      autocomplete="off"
+      spellcheck="false"
+      class="value-input mono"
+      [value]="inputValue()"
+      (input)="onValue($event)"
+      placeholder="输入数值"
+      aria-label="待换算数值"
+      [attr.aria-invalid]="invalid() ? 'true' : null"
+    />
+    <button type="button" class="btn btn-sm" (click)="flipSign()" title="切换正负" aria-label="切换正负">
+      ±
+    </button>
+    <span class="eq">=</span>
+    <select [value]="fromUnitId()" (change)="onFrom($event)" aria-label="源单位">
+      @for (u of category().units; track u.id) {
+        <option [value]="u.id" [selected]="u.id === fromUnitId()">{{ u.name }}（{{ u.symbol }}）</option>
+      }
+    </select>
+  </div>
+  @if (invalid()) {
+    <p class="err-note" role="alert">请输入数字（支持小数、负号与科学计数法）</p>
+  }
+
+  <ul class="results">
+    @for (r of rows(); track r.unitName + r.symbol) {
+      <li class="result-row" [class.from]="r.isFrom">
+        <span class="unit-name">
+          {{ r.unitName }}
+          <span class="symbol subtle mono">{{ r.symbol }}</span>
+        </span>
+        <span class="value mono">{{ r.value }}</span>
+        <app-copy-button [text]="r.value" />
+      </li>
+    }
+  </ul>
+</div>

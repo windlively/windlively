@@ -1,0 +1,220 @@
+<div class="stage">
+  <aside class="rail">
+    <div class="scene" aria-hidden="true">
+      <app-yard-cat />
+      <span class="scene-line"></span>
+    </div>
+    <div class="widget">
+      <div class="w-top"><div><b>windlively</b><p>程序员 · 前端 / 全栈</p></div></div>
+      <p class="w-note">咖啡续命 · 像素画 · 猫</p>
+    </div>
+    <div class="widget">
+      <p class="w-title">此刻 <span class="w-tag">随手记</span></p>
+      <ol class="tl now-list">
+        <li class="now"><b>此刻</b><p>一盏新茶，窗外有风</p></li>
+        <li><b>最近</b><p>在读《人间词话》</p></li>
+        <li><b>一直</b><p>把平常日子过得有滋味</p></li>
+      </ol>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topline">
+      <a class="brand" href="/" aria-label="windlively 首页">
+        <svg width="18" height="18" viewBox="0 0 16 16" shape-rendering="crispEdges" aria-hidden="true">
+          <rect x="3" y="6" width="9" height="7" fill="#fffdf7"/><rect x="3" y="6" width="9" height="1" fill="#667c61"/><rect x="3" y="12" width="9" height="1" fill="#667c61"/><rect x="2" y="9" width="1" height="3" fill="#667c61"/><rect x="12" y="8" width="2" height="3" fill="#667c61"/><rect x="13" y="7" width="1" height="1" fill="#667c61"/><rect x="2" y="14" width="12" height="1" fill="#667c61"/><rect x="5" y="3" width="1" height="2" fill="#dce6d5"/><rect x="8" y="2" width="1" height="2" fill="#dce6d5"/>
+        </svg>
+        <b>windlively</b>
+      </a>
+    </div>
+    <div class="greet">
+      <div>
+        <div class="gtop">
+          <span class="avatar" aria-hidden="true"><app-yard-cat mode="avatar" /></span>
+          <div>
+            <p class="idline"><i aria-hidden="true"></i>windlively · 前端 / 全栈 · 写一点小工具</p>
+            <h1>人间有味是清欢</h1>
+          </div>
+        </div>
+        <p class="lede">写一点代码，记一些想法，把好用的小东西收进这方小院。</p>
+      </div>
+      <div class="greet-scene">
+        <app-yard-scene />
+      </div>
+    </div>
+    <p class="scene-mono" aria-hidden="true">柳垂溪上 · 水过门前</p>
+
+    <div class="hero-cal">
+      <app-activity-calendar />
+    </div>
+
+    <nav class="tabs" role="tablist" aria-label="小院模块">
+      <button class="tab" role="tab" title="工具箱" aria-label="工具箱" [attr.aria-selected]="tab() === 'tools'" (click)="setTab('tools')"><svg width="20" height="20" viewBox="0 0 20 20" shape-rendering="crispEdges" aria-hidden="true"><rect x="7" y="3" width="6" height="1" fill="#243a32"/><rect x="7" y="4" width="1" height="2" fill="#243a32"/><rect x="12" y="4" width="1" height="2" fill="#243a32"/><rect x="3" y="6" width="14" height="1" fill="#243a32"/><rect x="3" y="7" width="14" height="7" fill="#667c61"/><rect x="3" y="14" width="14" height="1" fill="#243a32"/><rect x="9" y="9" width="2" height="3" fill="#eac976"/></svg></button>
+      <button class="tab" role="tab" title="手记" aria-label="手记" [attr.aria-selected]="tab() === 'notes'" (click)="setTab('notes')"><svg width="20" height="20" viewBox="0 0 20 20" shape-rendering="crispEdges" aria-hidden="true"><rect x="4" y="3" width="12" height="14" fill="#fffdf7"/><rect x="4" y="3" width="12" height="1" fill="#667c61"/><rect x="4" y="16" width="12" height="1" fill="#667c61"/><rect x="4" y="3" width="1" height="14" fill="#667c61"/><rect x="15" y="3" width="1" height="14" fill="#667c61"/><rect x="7" y="7" width="6" height="1" fill="#667c61"/><rect x="7" y="10" width="6" height="1" fill="#dce6d5"/><rect x="7" y="13" width="4" height="1" fill="#667c61"/></svg></button>
+      <button class="tab" role="tab" title="作品" aria-label="作品" [attr.aria-selected]="tab() === 'works'" (click)="setTab('works')"><svg width="20" height="20" viewBox="0 0 20 20" shape-rendering="crispEdges" aria-hidden="true"><rect x="3" y="3" width="5" height="1" fill="#243a32"/><rect x="3" y="4" width="5" height="2" fill="#cb8062"/><rect x="2" y="6" width="16" height="9" fill="#cb8062"/><rect x="2" y="6" width="16" height="1" fill="#243a32"/><rect x="2" y="14" width="16" height="1" fill="#243a32"/><rect x="2" y="6" width="1" height="9" fill="#243a32"/><rect x="17" y="6" width="1" height="9" fill="#243a32"/></svg></button>
+      <button class="tab" role="tab" title="关于" aria-label="关于" [attr.aria-selected]="tab() === 'about'" (click)="setTab('about')"><svg width="20" height="20" viewBox="0 0 20 20" shape-rendering="crispEdges" aria-hidden="true"><rect x="3" y="5" width="14" height="10" fill="#fffdf7"/><rect x="3" y="5" width="14" height="1" fill="#667c61"/><rect x="3" y="14" width="14" height="1" fill="#667c61"/><rect x="3" y="5" width="1" height="10" fill="#667c61"/><rect x="16" y="5" width="1" height="10" fill="#667c61"/><rect x="4" y="7" width="2" height="1" fill="#667c61"/><rect x="6" y="8" width="2" height="1" fill="#667c61"/><rect x="8" y="9" width="4" height="1" fill="#667c61"/><rect x="12" y="8" width="2" height="1" fill="#667c61"/><rect x="14" y="7" width="2" height="1" fill="#667c61"/></svg></button>
+    </nav>
+
+    <div class="panel-wrap">
+      @if (tab() === 'tools') {
+        <section class="panel is-active" role="tabpanel" aria-label="工具箱">
+          <div class="panel-scroll">
+            <div class="panel-head"><div class="head-l"><span class="kicker">WORKBENCH · 01</span><h2>工具箱</h2></div><span class="meta">六件小工具</span></div>
+            <div class="tools-grid">
+              <a class="card" [routerLink]="'/tools/ocr'">
+                <div class="card-top">
+                  <span class="ico"><svg width="24" height="24" viewBox="0 0 24 24" shape-rendering="crispEdges" aria-hidden="true"><rect x="4" y="9" width="16" height="10" fill="#667c61"/><rect x="8" y="6" width="8" height="3" fill="#667c61"/><rect x="9" y="11" width="6" height="6" fill="#f5f0e3"/><rect x="11" y="13" width="2" height="2" fill="#243a32"/><rect x="14" y="10" width="2" height="1" fill="#aabb9e"/><rect x="5" y="18" width="3" height="1" fill="#dce6d5"/></svg></span>
+                  <h3>图片识别</h3><span class="no">01</span>
+                </div>
+                <p>印刷体与手写体 OCR，识别由服务器后端完成。</p>
+              </a>
+              <a class="card" [routerLink]="'/tools/image-tools'">
+                <div class="card-top">
+                  <span class="ico"><svg width="24" height="24" viewBox="0 0 24 24" shape-rendering="crispEdges" aria-hidden="true"><rect x="7" y="4" width="13" height="11" fill="#aabb9e"/><rect x="4" y="8" width="15" height="12" fill="#667c61"/><rect x="5" y="9" width="13" height="10" fill="#fffdf7"/><rect x="6" y="15" width="5" height="3" fill="#dce6d5"/><rect x="10" y="13" width="3" height="5" fill="#dce6d5"/><rect x="14" y="11" width="2" height="2" fill="#cb8062"/></svg></span>
+                  <h3>图片工具</h3><span class="no">02</span>
+                </div>
+                <p>图片编码与格式转换，Base64 与尺寸信息。</p>
+              </a>
+              <a class="card" [routerLink]="'/tools/json-viewer'">
+                <div class="card-top">
+                  <span class="ico"><svg width="24" height="24" viewBox="0 0 24 24" shape-rendering="crispEdges" aria-hidden="true"><rect x="6" y="3" width="12" height="18" fill="#667c61"/><rect x="7" y="4" width="10" height="16" fill="#fffdf7"/><rect x="9" y="9" width="1" height="1" fill="#243a32"/><rect x="8" y="10" width="1" height="4" fill="#243a32"/><rect x="9" y="14" width="1" height="1" fill="#243a32"/><rect x="14" y="9" width="1" height="1" fill="#243a32"/><rect x="15" y="10" width="1" height="4" fill="#243a32"/><rect x="14" y="14" width="1" height="1" fill="#243a32"/></svg></span>
+                  <h3>JSON 预览</h3><span class="no">03</span>
+                </div>
+                <p>格式化与树形查看，长路径局部滚动。</p>
+              </a>
+              <a class="card" [routerLink]="'/tools/unit-convert'">
+                <div class="card-top">
+                  <span class="ico"><svg width="24" height="24" viewBox="0 0 24 24" shape-rendering="crispEdges" aria-hidden="true"><rect x="3" y="9" width="18" height="7" fill="#B68158"/><rect x="6" y="10" width="1" height="3" fill="#fffdf7"/><rect x="9" y="10" width="1" height="4" fill="#fffdf7"/><rect x="12" y="10" width="1" height="3" fill="#fffdf7"/><rect x="15" y="10" width="1" height="4" fill="#fffdf7"/><rect x="18" y="10" width="1" height="3" fill="#fffdf7"/></svg></span>
+                  <h3>单位转换</h3><span class="no">04</span>
+                </div>
+                <p>常用单位换算，小数与负数都能输入。</p>
+              </a>
+              <a class="card" [routerLink]="'/tools/monaco'">
+                <div class="card-top">
+                  <span class="ico"><svg width="24" height="24" viewBox="0 0 24 24" shape-rendering="crispEdges" aria-hidden="true"><rect x="5" y="5" width="14" height="10" fill="#243a32"/><rect x="6" y="6" width="12" height="8" fill="#fffdf7"/><rect x="8" y="8" width="5" height="1" fill="#667c61"/><rect x="8" y="10" width="7" height="1" fill="#cb8062"/><rect x="8" y="12" width="3" height="1" fill="#aabb9e"/><rect x="3" y="15" width="18" height="3" fill="#667c61"/></svg></span>
+                  <h3>Monaco 编辑器</h3><span class="no">05</span>
+                </div>
+                <p>浏览器里的代码编辑器，支持导出到本地。</p>
+              </a>
+              <a class="card" [routerLink]="'/tools/lab'">
+                <div class="card-top">
+                  <span class="ico"><svg width="24" height="24" viewBox="0 0 24 24" shape-rendering="crispEdges" aria-hidden="true"><rect x="11" y="3" width="2" height="4" fill="#dce6d5"/><rect x="8" y="4" width="2" height="2" fill="#dce6d5"/><rect x="14" y="4" width="2" height="2" fill="#dce6d5"/><rect x="10" y="7" width="4" height="3" fill="#aabb9e"/><rect x="8" y="10" width="8" height="3" fill="#aabb9e"/><rect x="7" y="13" width="10" height="3" fill="#aabb9e"/><rect x="6" y="16" width="12" height="4" fill="#aabb9e"/><rect x="8" y="17" width="8" height="2" fill="#667c61"/></svg></span>
+                  <h3>Angular 实验室</h3><span class="no">06</span>
+                </div>
+                <p>Angular 特性演示：信号、effect 与路由。</p>
+              </a>
+            </div>
+          </div>
+        </section>
+      }
+
+      @if (tab() === 'notes') {
+        <section class="panel is-active panel-notes" role="tabpanel" aria-label="手记">
+          <div class="panel-scroll">
+            <div class="panel-head"><div class="head-l"><span class="kicker">FIELD NOTES · 02</span><h2>手记</h2></div><span class="meta"><a href="https://windlively.github.io" target="_blank" rel="noopener">去博客看看 →</a></span></div>
+            <article class="quote-card">
+              <p class="q-label">MARGIN NOTE · 手边记</p>
+              <p class="q-text">“不必每一天都闪闪发光，<br>有一盏茶的温度，也很好。”</p>
+              <span class="q-sign">— 写给寻常日子的便笺</span>
+            </article>
+            <div class="notes-list">
+              @if (!postsLoaded()) {
+                <p class="placeholder subtle">正在取文章……</p>
+              } @else if (posts()?.length) {
+                @for (p of posts(); track p.url) {
+                  <a class="note" [href]="p.url" target="_blank" rel="noopener"
+                    ><time>{{ p.date }}</time><b>{{ p.title }}</b
+                    ><span class="stamp">{{ $index + 1 < 10 ? '0' + ($index + 1) : $index + 1 }}</span></a
+                  >
+                }
+              } @else {
+                <p class="placeholder subtle">
+                  暂时未取到文章，<a href="https://windlively.github.io" target="_blank" rel="noopener"
+                    >去博客看看 →</a
+                  >
+                </p>
+              }
+            </div>
+          </div>
+        </section>
+      }
+
+      @if (tab() === 'works') {
+        <section class="panel is-active" role="tabpanel" aria-label="作品">
+          <div class="panel-scroll">
+            <div class="works-head">
+              <span class="kicker">PROJECTS · 03</span>
+              <h2>作品</h2>
+              <span class="repo-status mono subtle" aria-live="polite">{{ repoNote() }}</span>
+              <button
+                class="refresh"
+                type="button"
+                (click)="refreshRepos()"
+                [disabled]="repoLoading()"
+                aria-label="刷新仓库列表"
+                title="刷新仓库列表"
+              >
+                <app-icon name="refresh" [size]="14" />
+              </button>
+              <div class="tabs2" role="group" aria-label="仓库来源">
+                <button class="tab2" [attr.aria-pressed]="repo() === 'github'" (click)="setRepo('github')">GitHub</button>
+                <button class="tab2" [attr.aria-pressed]="repo() === 'gitee'" (click)="setRepo('gitee')">Gitee</button>
+              </div>
+            </div>
+            <div class="works-grid">
+              @if (repos()?.length) {
+                @for (r of repos(); track r.url) {
+                  <a class="card repo" [href]="r.url" target="_blank" rel="noopener">
+                    <h3>{{ r.name }}</h3>
+                    @if (r.description) {
+                      <p>{{ r.description }}</p>
+                    }
+                    <div class="row">
+                      <span class="dot" [style.background]="langColor(r.language)"></span>{{ r.language || '—'
+                      }}<span class="stars">★ {{ r.stars }}</span>
+                    </div>
+                  </a>
+                }
+              } @else if (!reposLoaded()) {
+                <p class="placeholder subtle">正在更新仓库……</p>
+              } @else {
+                <p class="placeholder subtle">
+                  暂时未取到仓库数据，可到
+                  <a href="https://github.com/windlively" target="_blank" rel="noopener">GitHub</a> 或
+                  <a href="https://gitee.com/windlively" target="_blank" rel="noopener">Gitee</a> 看看。
+                </p>
+              }
+            </div>
+          </div>
+        </section>
+      }
+
+      @if (tab() === 'about') {
+        <section class="panel is-active panel-about" role="tabpanel" aria-label="关于">
+          <div class="panel-scroll">
+            <div class="panel-head"><div class="head-l"><span class="kicker">ABOUT THE YARD · 04</span><h2>关于这方小院</h2></div><span class="meta">博客 · GitHub · Gitee · 邮件</span></div>
+            <div class="about-grid">
+              <div class="widget">
+                <p class="w-title">小院年表 <span class="w-tag">示意</span></p>
+                <ol class="tl">
+                  <li class="now"><time>2026.10</time><b>像素小院改版</b><p>元素融入 · 活跃日历</p></li>
+                  <li><time>2026.09</time><b>改名 windlively</b><p>重写为 Angular</p></li>
+                  <li><time>2026.06</time><b>六件工具入住</b><p>OCR · 图片 · JSON …</p></li>
+                  <li><time>2020.11</time><b>备案与域名</b><p>小院开张</p></li>
+                </ol>
+              </div>
+              <div class="letter">
+                <p class="poem-source">苏轼 · 浣溪沙</p>
+                <blockquote class="poem">细雨斜风作晓寒，淡烟疏柳媚晴滩。<br>入淮清洛渐漫漫。<br>雪沫乳花浮午盏，蓼茸蒿笋试春盘。<br>人间有味是清欢。</blockquote>
+                <p class="letter-line">这里放着我写的代码、做的小工具，以及一些值得留下的想法。</p>
+                <div class="links">
+                  <a href="https://windlively.github.io" target="_blank" rel="noopener">博客</a><a href="https://github.com/windlively" target="_blank" rel="noopener">GitHub</a><a href="https://gitee.com/windlively" target="_blank" rel="noopener">Gitee</a><a href="mailto:windlively@live.cn">windlively@live.cn</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      }
+    </div>
+  </main>
+</div>

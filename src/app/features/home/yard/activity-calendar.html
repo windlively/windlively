@@ -1,0 +1,50 @@
+<div class="cal-row">
+  <div class="cal-cap">
+    <span class="hc-kicker">FOOTPRINTS · 活跃足迹</span>
+    @if (state() === 'ok') {
+      <span class="sum">过去一年 <b>{{ total() }}</b> 次贡献 · 最长连续 <b>{{ best() }}</b> 天</span>
+      <span class="cal-note">
+        悬停看单日 · 数据截至 {{ updated() }} · 来源 GitHub{{ total() === 0 ? ' · 安静的一年' : '' }}
+      </span>
+      <span class="cal-right">
+        <span class="cal-legend">
+          <span>少</span><i class="c"></i><i class="c" data-l="1"></i><i class="c" data-l="2"></i><i class="c" data-l="3"></i><i class="c" data-l="4"></i><span>多</span>
+        </span>
+        <a class="cal-go" href="https://github.com/windlively" target="_blank" rel="noopener">在 GitHub 看细节 →</a>
+      </span>
+    } @else {
+      <span class="sum">{{ state() === 'loading' ? '正在取足迹……' : '暂未取到活跃数据' }}</span>
+    }
+  </div>
+  <div class="cal-scroll">
+    @if (state() === 'ok') {
+      <div class="cal">
+        <div class="cal-weeks">
+          <span>一</span><span></span><span>三</span><span></span><span>五</span><span></span><span></span>
+        </div>
+        <div class="cal-body">
+          <div class="cal-months" [style.grid-template-columns]="'repeat(' + weeks().length + ',10px)'">
+            @for (w of weeks(); track $index) {
+              <span>{{ w.label }}</span>
+            }
+          </div>
+          <div class="cal-grid" role="img" [attr.aria-label]="gridLabel()" (mouseover)="onOver($event)" (mouseleave)="hide()">
+            @for (w of weeks(); track $index) {
+              @for (d of w.days; track $index) {
+                <i class="c" [class.f]="d.f" [attr.data-l]="d.f ? null : d.level" [attr.data-tip]="d.tip ?? null" aria-hidden="true"></i>
+              }
+            }
+          </div>
+        </div>
+      </div>
+    } @else if (state() === 'missing') {
+      <p class="cal-msg">
+        暂未取到活跃足迹，可稍后再来，或直接
+        <a href="https://github.com/windlively" target="_blank" rel="noopener">去 GitHub 看看 →</a>
+      </p>
+    } @else {
+      <p class="cal-msg">正在取足迹……</p>
+    }
+  </div>
+</div>
+<div class="cal-tip" #tip role="tooltip" aria-hidden="true" [class.show]="tipVisible()" [style.left.px]="tipLeft()" [style.top.px]="tipTop()">{{ tipText() }}</div>

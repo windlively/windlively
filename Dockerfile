@@ -1,10 +1,10 @@
-FROM node:alpine as builder
+FROM node:22-alpine as builder
 WORKDIR /app
-COPY package.json .
-RUN npm install
+COPY package.json package-lock.json .npmrc ./
+RUN npm ci
 COPY . .
-RUN ng build --aot --prod
+RUN npm run build
 
 FROM nginx:latest
 COPY nginx.conf /etc/nginx
-COPY --from=builder /app/dist/starry /usr/share/nginx/html
+COPY --from=builder /app/dist/windlively/browser /usr/share/nginx/html

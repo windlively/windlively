@@ -1,0 +1,70 @@
+<app-tool-head toolId="ocr" />
+
+<div class="glass body">
+  <div class="top">
+    <app-tabs [tabs]="tabs" [value]="mode()" (valueChange)="onMode($event)" />
+    <span class="subtle note">单张图片 ≤ 5MB；识别由服务器后端完成，图片会上传至服务端</span>
+  </div>
+
+  <div class="grid">
+    <div class="pane">
+      <app-drop-zone
+        hint="拖拽图片到此处，或点击选择"
+        sub="支持 JPG / PNG / WebP 等常见格式"
+        [disabled]="busy()"
+        (picked)="onFile($event)"
+      />
+      @if (preview()) {
+        <div class="preview-wrap">
+          <img
+            class="preview"
+            [src]="preview()"
+            alt="待识别图片"
+            role="button"
+            tabindex="0"
+            (click)="openPreview()"
+            (keydown.enter)="openPreview()"
+            (keydown.space)="$event.preventDefault(); openPreview()"
+          />
+          <div class="file-meta subtle">
+            <span class="file-name">{{ fileName() }}</span>
+            <button type="button" class="btn btn-sm" (click)="openPreview()">大图</button>
+            <button type="button" class="btn btn-sm" (click)="clear()" [disabled]="busy()">移除</button>
+          </div>
+        </div>
+        @if (busy()) {
+          <app-progress [value]="progress()" />
+        }
+        <button
+          type="button"
+          class="btn btn-primary start"
+          [disabled]="busy() || !preview()"
+          (click)="recognize()"
+        >
+          <app-icon name="scan" [size]="16" />
+          {{ busy() ? (progress() < 100 ? '上传中…' : '识别中…') : '开始识别' }}
+        </button>
+      }
+    </div>
+
+    <div class="pane">
+      <div class="pane-head">
+        <span class="pane-title"><app-icon name="file-text" [size]="16" /> 识别结果</span>
+        <span class="spacer"></span>
+        @if (result()) {
+          <span class="subtle count">{{ resultChars() }} 字</span>
+          <app-copy-button [text]="result()" label="复制" />
+        }
+      </div>
+      <textarea
+        class="result mono"
+        readonly
+        [value]="result()"
+        placeholder="识别结果将显示在这里……"
+        aria-label="识别结果"
+      ></textarea>
+    </div>
+  </div>
+
+  <app-lightbox [src]="lightboxSrc()" (closed)="lightboxSrc.set(null)" />
+</div>
