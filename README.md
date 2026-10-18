@@ -8,7 +8,7 @@
 
 ## 在做的事
 
-- **清欢小院** — 个人主页与站内手记：纸白墨绿的小院，装着十四个小工具、四季窗景、天空系统与慢慢长大的猫。[源码](https://github.com/windlively/windlively-home)
+- **清欢小院** — 个人主页与站内手记：纸白墨绿的小院，装着十四个小工具、四季窗景、天空系统与慢慢长大的猫。
 - **GitLoom** — 受 IDEA 启发的 Git 工作台，停在 VS Code 终端旁边。[源码](https://github.com/windlively/GitLoom)
 - **手记** — 技术笔记与日常记录；源文在 Obsidian，公开笔记自动同步到站内阅读页。
 
